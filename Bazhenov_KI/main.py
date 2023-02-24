@@ -1,119 +1,106 @@
 import sys
-import os
 
-def sort_string(TEXT, MAX_INDEX, START_INDEX, INDEX_INC, L_RULE,D_RULE, FILE_CNT):
-    CNT = START_INDEX
-    END_INDEX = -1
-    TEXT_LENGTH = len(TEXT)
-    if CNT == TEXT_LENGTH + 1:
+def processing_and_cropping_str(text, max_index, start_index, INDEX_INC, l_rule, d_rule, file_cnt) -> int:
+    cnt = start_index
+    end_index = -1
+    text_length = len(text)
+    if cnt == text_length + 1:
         print('Строки разделены')
-        quit()
-    if TEXT_LENGTH - CNT < INDEX_INC:
-            print_string(TEXT_LENGTH, MAX_INDEX, TEXT, START_INDEX, INDEX_INC, L_RULE, D_RULE, FILE_CNT)
-    while ((CNT <= MAX_INDEX) and CNT != TEXT_LENGTH):
-        if TEXT[CNT] == '@':
-            CNT_SAVE = CNT
-            temp = TEXT.find(':', CNT, TEXT_LENGTH - 1)
-            if temp < (MAX_INDEX - 1) and temp != -1:
-                CNT = temp + 1
-                if (L_RULE == 1):
-                    CNT += 1
-                    while TEXT[CNT].isnumeric() == 1:
-                        CNT += 1
-                        if TEXT[CNT] == TEXT[-1]:
+        return 0
+    if text_length - cnt < INDEX_INC:
+            if print_string(text_length, max_index, text, start_index, INDEX_INC, l_rule, d_rule, file_cnt) == 0:
+                return 0
+    while ((cnt <= max_index) and cnt != text_length):
+        if text[cnt] == '@':
+            cnt_save = cnt
+            temp = text.find(':', cnt, text_length - 1)
+            if temp < (max_index - 1) and temp != -1:
+                cnt = temp + 1
+                if (l_rule == 1):
+                    cnt += 1
+                    while text[cnt].isnumeric() == 1:
+                        cnt += 1
+                        if text[cnt] == text[-1]:
                             break
-                    if CNT >= MAX_INDEX and END_INDEX == -1:
+                    if cnt >= max_index and end_index == -1:
                         print('Невозможно разделить следующую строку ')
-                        quit()
-                    if CNT >= MAX_INDEX:
-                        CNT = CNT_SAVE + 1
+                        return 0
+                    if cnt >= max_index:
+                        cnt = cnt_save + 1
             elif temp == -1:
-                CNT += 1
-            elif END_INDEX == -1:
+                cnt += 1
+            elif end_index == -1:
                 print('Невозможно разделить следующую строку ')
-                quit()
+                return 0
             else:
-                print_string(END_INDEX, MAX_INDEX, TEXT, START_INDEX, INDEX_INC, L_RULE, D_RULE, FILE_CNT)
-
-        if TEXT[CNT] == ' ':
-            END_INDEX = CNT
-            if CNT - 1 < MAX_INDEX:
-                CNT += 1
-        elif TEXT[CNT] == '\n':
-            END_INDEX = CNT
-            if CNT - 1 < MAX_INDEX:
-                CNT += 1
+                if print_string(end_index, max_index, text, start_index, INDEX_INC, l_rule, d_rule, file_cnt) == 0:
+                    return 0
+        if text[cnt] == ' ' or text[cnt] == '\n':
+            end_index = cnt
+            if cnt - 1 < max_index:
+                cnt += 1
         else:
-            CNT += 1
-    if END_INDEX == -1:
+            cnt += 1
+    if end_index == -1:
         print('Невозможно разделить строку')
-        quit()
-    print_string(END_INDEX, MAX_INDEX, TEXT, START_INDEX, INDEX_INC, L_RULE, D_RULE, FILE_CNT)
+        return 0
+    if print_string(end_index, max_index, text, start_index, INDEX_INC, l_rule, d_rule, file_cnt) == 0:
+        return 0
 
-def print_string(END_INDEX, MAX_INDEX, TEXT, START_INDEX, INDEX_INC, L_RULE, D_RULE, FILE_CNT):
-    FINAL_STR = TEXT[START_INDEX:END_INDEX]
-    if D_RULE == 1:
-        # NEW_FILE = open(fr"{sys.argv[7]}\STR{FILE_CNT}.txt", "w+")
-        # NEW_FILE.write(FINAL_STR)
-        # NEW_FILE.close()
-        # os.mknod("str" + FILE_CNT + " .txt")
-        with open (sys.argv[7] + "str" + str(FILE_CNT) + ".txt", "w") as NEW_FILE:
-            NEW_FILE.write("%s" % FINAL_STR)
-        # with open('str'+FILE_CNT+' .txt', 'w') as f:
-        #     f.write("%s\n" % FINAL_STR)
-        # NEW_FILE = os.path.join(f"{sys.argv[7]}", f'str{FILE_CNT}.txt')
-        # print(FINAL_STR, NEW_FILE)
-        FILE_CNT += 1
-    print(FINAL_STR)
-    # print('\n')
-    START_INDEX = END_INDEX + 1
-    MAX_INDEX = START_INDEX + INDEX_INC
-    sort_string(TEXT, MAX_INDEX, START_INDEX, INDEX_INC, L_RULE, D_RULE, FILE_CNT)
+def print_string(end_index, max_index, text, start_index, INDEX_INC, l_rule, d_rule, file_cnt) -> int:
+    final_str = text[start_index:end_index]
+    if d_rule == 1:
+        with open (sys.argv[7] + "str" + str(file_cnt) + ".txt", "w") as new_file:
+            new_file.write("%s" % final_str)
+        file_cnt += 1
+    print(final_str)
+    start_index = end_index + 1
+    max_index = start_index + INDEX_INC
+    if processing_and_cropping_str(text, max_index, start_index, INDEX_INC, l_rule, d_rule, file_cnt) == 0:
+        return 0
 
-def main(args: list[str]):
-    L_RULE = 0
-    D_RULE = 0
+def main(args: list[str]) -> int:
+    l_rule = 0
+    d_rule = 0
     print('Введите -f "путь к файлу" -n "Максимальное количество символов"')
     if len(sys.argv) == 1:
-         print('Введите -f "путь к файлу" -n "Максимальное количество символов"')
-         # Нужно вернуться к началу выполнения функции
+         print('Введены недопустимые параметры. Введите -f "путь к файлу" -n "Максимальное количество символов" -l -d')
+         return 0
     else:
-        PARAM_NAME = sys.argv[1]
-    if PARAM_NAME == '-f':
+        param_name = sys.argv[1]
+    if param_name == '-f':
         FILE_PATH = sys.argv[2]
     else:
-        print(f'Неизвесный параметр {PARAM_NAME}')
-        quit()
-    PARAM_NAME = sys.argv[3]
-    if PARAM_NAME == '-n':
-        MAX_INDEX = int(sys.argv[4]) + 1
+        print(f'Неизвесный параметр {param_name}')
+        return 0
+    param_name = sys.argv[3]
+    if param_name == '-n':
+        max_index = int(sys.argv[4]) + 1
     else:
-        print(f'Неизвесный параметр {PARAM_NAME}')
-        quit()
+        print(f'Неизвесный параметр {param_name}')
+        return 0
     if len(sys.argv) > 4:
-        PARAM_NAME = sys.argv[5]
-        if PARAM_NAME == '-l':
-            L_RULE = 1
+        param_name = sys.argv[5]
+        if param_name == '-l':
+            l_rule = 1
         else:
-            print(f'Неизвесный параметр {PARAM_NAME}')
-            quit()
+            print(f'Неизвесный параметр {param_name}')
+            return 0
     if len(sys.argv) > 5:
-        PARAM_NAME = sys.argv[6]
-        if PARAM_NAME == '-d':
-            D_RULE = 1
-            # FILE_PATH = f"{sys.argv[7]}"
-            # os.mkdir(FILE_PATH, mode=0o777)
+        param_name = sys.argv[6]
+        if param_name == '-d':
+            d_rule = 1
         else:
-            print(f'Неизвесный параметр {PARAM_NAME}')
-            quit()
+            print(f'Неизвесный параметр {param_name}')
+            return 0
 
-    INDEX_INC = MAX_INDEX
-    FILE_CNT = 1
-
-    file = open(sys.argv[2])
-    TEXT = file.read()
-    START_INDEX = 0
-    sort_string(TEXT, MAX_INDEX, START_INDEX, INDEX_INC, L_RULE, D_RULE, FILE_CNT)
+    INDEX_INC = max_index
+    file_cnt = 1
+    with open (sys.argv[2], "r") as file:
+        text = file.read()
+    start_index = 0
+    if (processing_and_cropping_str(text, max_index, start_index, INDEX_INC, l_rule, d_rule, file_cnt) == 0):
+        return 0
 
 if __name__=='__main__':
     main(sys.argv)
