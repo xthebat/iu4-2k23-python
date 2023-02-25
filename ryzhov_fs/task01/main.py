@@ -2,6 +2,7 @@ import os.path
 import sys
 
 
+# Func handles args
 def args_handler(argv: list[str]) -> dict or int:
     args_dict = {"-f": "",
                  "-n": "200",
@@ -52,6 +53,8 @@ def args_handler(argv: list[str]) -> dict or int:
     return args_dict
 
 
+# Func creates list of username-tag indexes
+# These indexes are skipped while separating file strings
 def find_tag_exceptions(file_str: str) -> list[int]:
     at_ptr = 0
     tag_exception_indexes = []
@@ -68,6 +71,7 @@ def find_tag_exceptions(file_str: str) -> list[int]:
     return tag_exception_indexes
 
 
+# Func finds spaces or \n as separate indexes
 def find_sep_indexes(file_str: str, tag_exception_indexes: list[int], max_substring_len: int, line_sep_flag: bool, ) -> \
         list[int] or int:
     high_sep_index = 0
@@ -98,6 +102,7 @@ def find_sep_indexes(file_str: str, tag_exception_indexes: list[int], max_substr
     return sep_indexes
 
 
+# Func prints out substrings to files or I/O
 def print_substrings(file_str: str, sep_indexes: list[int], output_file_path: str or bool):
     number_of_substrings = len(sep_indexes) - 1
     if output_file_path == False:
