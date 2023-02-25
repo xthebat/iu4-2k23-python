@@ -55,8 +55,8 @@ def get_arguments():
     arguments.add_argument(
         "-r",
         type=str,
-        dest="dir",
-        help="Save directory"
+        dest="code_row",
+        help="Line of code"
     )
     return arguments
 
@@ -110,10 +110,13 @@ def file_handling(options):
                             """ Checking for the correctness of the -d argument 
                                 and for the existence of a directory. If the directory does not exist,
                                 the result will be printed to the console. """
-                            if options.dir and os.path.exists(options.dir):
-                                namefile = f"{options.dir}/substring_#{count}.txt"
-                                with open(namefile, 'w+') as wfile:
-                                    wfile.write(substring)
+                            if options.dir:
+                                if os.path.exists(options.dir):
+                                    namefile = f"{options.dir}/substring_#{count}.txt"
+                                    with open(namefile, 'w+') as wfile:
+                                        wfile.write(substring)
+                                else:
+                                    print(f'Path {options.dir} does not exist', end='\n')
                             else:
                                 print(f'Substring #{count}:\n\t{substring.strip()}', end='\n')
                             count += 1
@@ -124,7 +127,7 @@ def file_handling(options):
 def main():
     arguments = get_arguments()
     options = arguments.parse_args()
-    if os.path.exists(options.source):  # Checking for the existence of a file
+    if options.source and os.path.exists(options.source):  # Checking for the existence of a file
         file_handling(options)
     else:
         print(f'File {options.source} not exist!', end='\n')
