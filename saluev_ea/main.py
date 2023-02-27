@@ -130,7 +130,7 @@ def file_handling(options):
 def main():
     options = get_arguments().parse_args()
     if not options.source or not os.path.exists(options.source):  # Checking for the existence of a file
-        print(f'File {options.source} not exist!', end='\n')
+        print(f'File {options.source} not exist!\n')
         return
     file_handling(options)
 
