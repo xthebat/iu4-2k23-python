@@ -79,10 +79,12 @@ def split_line(file_split_data: list):
 
     try:
         char_number = int(sys.argv[sys.argv.index('-n') + 1])
-    except TypeError:
+    except ValueError:
         char_number = 200
 
     for word in file_split_data:
+        if len(word) > char_number:
+            sys.exit('Cant split line,-n value is too small')
         if len(substring) + len(word) <= char_number:
             if not word:
                 continue
@@ -119,7 +121,7 @@ def save_file(result, index_sub):
     return
 
 
-# -----------------------------Вызов функций---------------------
+# ------------------Вызов функций---------------------
 
 def main():
     check_parameter()
