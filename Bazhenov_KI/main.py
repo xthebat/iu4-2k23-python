@@ -75,8 +75,8 @@ def main() -> int:
     if len(sys.argv) == 1 or sys.argv.index('-f') == -1 or sys.argv.index('-n') == -1:
         print('Введены недопустимые параметры. Введите -f "путь к файлу" -n "Максимальное количество символов" -l -d')
         return 0
-    file_path = sys.argv[sys.argv.index('-f') + 2]
-    max_cnt = int(sys.argv[sys.argv.index('-n') + 2]) + 1
+    file_path = sys.argv[sys.argv.index('-f') + 1]
+    max_cnt = int(sys.argv[sys.argv.index('-n') + 1]) + 1
     if len(sys.argv) > 4:
         if sys.argv.index('-l') == -1 and sys.argv.index('-d') == -1:
             print('Введены недопустимые параметры.')
@@ -85,7 +85,7 @@ def main() -> int:
             l_rule = 1
         if sys.argv.index('-d') != -1:
             d_rule = 1
-            file_dir = sys.argv[sys.argv.index('-d') + 2]
+            file_dir = sys.argv[sys.argv.index('-d') + 1]
     index_inc = max_cnt
     with open(file_path, "r") as file:
         text = file.read()
