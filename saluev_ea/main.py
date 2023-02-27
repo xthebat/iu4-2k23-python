@@ -1,8 +1,7 @@
 import os
 import argparse
 
-# ToDo: 1: Refactor line
-#       2: Added hardcore
+# ToDo: 1: Refactor tag = False
 
 
 # Function for working with arguments
@@ -57,10 +56,14 @@ def get_arguments():
     arguments.add_argument(
         "-r",
         type=str,
-        dest="code_row",
+        dest="row",
         help="Line of code"
     )
     return arguments
+
+
+class CantEvaluate(Exception):
+    pass
 
 
 def line_separator(line, options):
@@ -69,7 +72,15 @@ def line_separator(line, options):
     result = []  # Substring array
     substring = ''
     s_line = line.split()
-    if options.lrz and line.find('@') != -1:
+
+    try:
+        func = eval(options.row)
+    except Exception as error:
+        raise CantEvaluate(options.row) from error
+
+    if func(line):
+        result.append(line)
+    elif options.lrz and line.find('@') != -1:
         result.append(line)
     else:
         for word in s_line:
