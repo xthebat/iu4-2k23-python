@@ -8,9 +8,9 @@ import sys
 # --------------------Проверка аргументов командной строки--------------------------
 def check_parameter():
     if '-f' not in sys.argv:
-        sys.exit(f'Error parameter with code 1')
+        sys.exit('Error parameter with code 1')
     if '-n' not in sys.argv:
-        sys.exit(f'Error parameter with code 2')
+        sys.exit('Error parameter with code 2')
     if '-d' in sys.argv:
         return 1
     if '-l' in sys.argv:
