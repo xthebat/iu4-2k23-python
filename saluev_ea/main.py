@@ -1,7 +1,9 @@
 import os
 import argparse
 
-# ToDo: 1: Refactor tag = False
+
+class CantEvaluate(Exception):
+    pass
 
 
 # Function for working with arguments
@@ -62,17 +64,13 @@ def get_arguments():
     return arguments
 
 
-class CantEvaluate(Exception):
-    pass
-
-
 def line_separator(line, options):
-    tag = False
     idx = 0  # index of a letter in the string
     result = []  # Substring array
     substring = ''
     s_line = line.split()
 
+    # Functionality [-r] check
     try:
         func = eval(options.row)
     except Exception as error:
@@ -84,15 +82,14 @@ def line_separator(line, options):
         result.append(line)
     else:
         for word in s_line:
-            if word.find('@') != -1 or tag:
-                if word.find(':') != -1:
-                    tag = False
-                    idx += 1
-                    continue
-                else:
-                    tag = True
-                    substring += f'{word} '
-            substring += f'{s_line[idx+1]} ' if tag else f'{word} '
+            if word.find('@') != -1:
+                substring += f'{word} {s_line[idx+1]} '
+                idx += 1
+                continue
+            elif word.find(':') != -1:
+                idx += 1
+                continue
+            substring += f'{word} '
             if len(substring) >= options.num:
                 result.append(substring)
                 substring = ''
