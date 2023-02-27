@@ -82,11 +82,6 @@ def find_sep_indexes(file_str: str, tag_exception_indexes: list[int], max_substr
 
         sep_space = ' ' if not line_sep_flag else ''
 
-        # if not line_sep_flag:
-        #     sep_space = ' '
-        # else:
-        #     sep_space = ''
-
         if high_sep_index >= len(file_str):
             high_sep_index = len(file_str)
         else:
