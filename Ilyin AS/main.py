@@ -16,7 +16,7 @@ def main(args: list[str]) -> int:
 
 # read file
 def read_file(file_name) -> str:
-    with open(file_name, 'r') as r:
+    with open(file_name, 'r', encoding='utf-8') as r:
         u = r.read()
         return u
 
