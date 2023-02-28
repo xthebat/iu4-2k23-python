@@ -11,16 +11,17 @@ def args_handler(argv: list[str]) -> dict or int:
 
     args_set = {"-f", "-n", "-l", "-d"}
 
+    # Not enough args
     if len(argv) < 2:
-        print("Not enough arguments")
         return -1
 
+    # Check -f arg
     if '-f' in argv:
         f_index = argv.index('-f')
     else:
-        print("No '-f' argument")
         return -1
 
+    # Check -f file_name arg
     if (f_index + 1) < len(argv):
         if argv[f_index + 1] not in args_set:
             file_name = argv[f_index + 1]
@@ -29,10 +30,11 @@ def args_handler(argv: list[str]) -> dict or int:
             print("-f argument should have file name after it")
             return -1
 
+    # Check if file exists
     if not os.path.exists(file_name):
-        print("No such file")
         return -1
 
+    # Check -n arg
     if '-n' in argv:
         n_index = argv.index('-n')
         substr_len_index = n_index + 1
@@ -40,9 +42,11 @@ def args_handler(argv: list[str]) -> dict or int:
             if argv[substr_len_index] not in args_set and argv[substr_len_index].isdigit():
                 args_dict["-n"] = int(argv[substr_len_index])
 
+    # Check -l arg
     if '-l' in argv:
         args_dict["-l"] = True
 
+    # Check -d arg
     if '-d' in argv:
         d_index = argv.index('-d')
         args_dict["-d"] = ".\\"
@@ -51,6 +55,15 @@ def args_handler(argv: list[str]) -> dict or int:
                 args_dict["-d"] = argv[d_index + 1]
 
     return args_dict
+
+
+def show_script_usage():
+    print("usage: main.py [<args>]")
+    print("\t-h\tPrint help")
+    print("\t-f <file_path>\tPath to file (file should exist)")
+    print("\t-n <max_substring_len>\tSet max substring length, by default <max_substring_len>=200")
+    print("\t-l\tDo not split substrings at the middle of line")
+    print("\t-d <folder_path>\tPrint substrings to files")
 
 
 # Func creates list of username-tag indexes
@@ -123,6 +136,7 @@ def print_substrings(file_str: str, sep_indexes: list[int], output_file_path: st
 
 def main(argv: list[str]) -> int:
     if (args_dict := args_handler(argv)) == -1:
+        show_script_usage()
         return -1
     else:
         file_name = args_dict["-f"]
