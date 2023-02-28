@@ -95,30 +95,34 @@ def split_line(file_split_data: list):
                 substring += ' '
             continue
         result += f'Substring #{i}:\n' + substring + '\n'
-        print(result)
+        print_save_file(result, i, 2)
         substring = ''
         if word[0] == '-':
             substring += '\t'
         substring += word + ' '
         check_result = check_parameter()
         if check_result == 1:
-            save_file(result, i)
+            print_save_file(result, i, 1)
         result = ''
         i += 1
 
     result += f'Substring #{i}:\n' + substring + '\n'
     check_result = check_parameter()
     if check_result == 1:
-        save_file(result, i)
-    print(result)
+        print_save_file(result, i, 1)
+    print_save_file(result, i, 2)
 
 
 # -------------Bonus 2---------------------
 
-def save_file(result, index_sub):
-    with open(f'substring_{index_sub}.txt', 'w') as file:
-        file.write(f'{result}\n')
-    return
+def print_save_file(result, index_sub, i):
+    if i == 1:
+        with open(f'substring_{index_sub}.txt', 'w') as file:
+            file.write(f'{result}\n')
+        return
+    if i == 2:
+        print(result)
+        return
 
 
 # ------------------Вызов функций---------------------
