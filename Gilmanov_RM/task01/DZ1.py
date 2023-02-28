@@ -3,24 +3,21 @@ import sys
 
 
 def symbCounter(name: str, number: int) -> bool:  # Проверка длины ссылки
-    file = open(name, encoding='utf-8')
-    text = file.read()
-    link = text[text.find("http"):len(text)]
-    file.close()
-    if len(link) <= number:  # Если длина ссылки меньше введенного значения
-        return True  # то выводим True
-    else:
-        return False
+    with open(name, encoding='utf-8') as file:
+        text = file.read()
+        link = text[text.find("http"):len(text)]
+        file.close()
+    return len(link) <= number  # Если длина ссылки меньше введенного значения, то выводим True
 
 
 def splitStr(name: str, number: int) -> list[str]:
     mass = []
     file = open(name, encoding='utf-8')
+    text = file.read()
+    file.close()
     pos = 0
     ind = 0
     prevpos = 0
-    text = file.read()
-    file.close()
     i = 0
     pos = text.find(" ", pos)
     fixPos = pos
