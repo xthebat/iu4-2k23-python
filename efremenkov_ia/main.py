@@ -90,14 +90,11 @@ def divide_strings_from_file(allow_splitting: bool, filepath: str, rule: str, ma
             substring_list[idx] = keyword + substring_list[idx]
 
     if allow_splitting is False:
-        substrings = []
-        for x in substring_list:
-            (substrings.append(x.strip(keyword)) if keyword in x else substrings.extend(x.split()))
-
-        substring_list = substrings
+        substring_list = [(x.strip(keyword) if keyword in x else x.split()) for x in substring_list]
+        substring_list = [item for sublist in substring_list for item in sublist]
 
     for idx, current_substring_part in enumerate(substring_list):
-        if current_substring_part is not None and idx < len(substring_list) - 1 \
+        if current_substring_part is not None and idx < len(substring_list) - 1\
                 and re.search('^@', current_substring_part) and re.search(':$', substring_list[idx + 1]):
             substring_list[idx] += f" {substring_list[idx + 1]}"
             # noinspection PyTypeChecker
@@ -123,7 +120,7 @@ def save_output_file(substrings: list[str], directory: str):
             f.write(current_substring)
 
 
-class SubstringGatherer:
+class SubstringSplitter:
 
     def __init__(self, argv):
         try:
@@ -149,7 +146,7 @@ class SubstringGatherer:
 
 
 if __name__ == '__main__':
-    sg = SubstringGatherer(sys.argv)
+    sg = SubstringSplitter(sys.argv)
     sg.main()
 
 '''
