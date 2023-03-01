@@ -23,14 +23,14 @@ def splitStr(name: str, number: int) -> list[str]:
     fixPos = pos
     link = 0
     sample = text[0:pos]
-    while (ind != -1):
+    while ind != -1:
         if link == 0:
             while number > len(text[prevpos:pos]):
                 if text.find("@", pos) - pos == 1:
                     i = text.index(":", pos) - text.index("@", pos)
-                    if number - len(text[prevpos:pos]) > i:
+                    if number - len(text[prevpos:pos]) > i + 1:
                         sample = text[prevpos:pos]
-                    elif number - len(text[prevpos:pos]) == i:
+                    elif number - len(text[prevpos:pos]) == i + 1:
                         pos = text.find(":", pos)
                         sample = text[prevpos:pos]
                         break
@@ -63,7 +63,7 @@ def splitStr(name: str, number: int) -> list[str]:
 
 def output(strings: list[str]):
     for i in range(len(strings)):
-        print(f"Substring #{i + 1}:\n{strings[i]}")
+        print(f"Substring #{i + 1} ({len(strings[i])}):\n{strings[i]}")
 
 
 def main(args: list[str]):
