@@ -4,7 +4,6 @@ import re
 from typing import List
 import random
 import string
-import time
 from pathlib import Path
 
 os.chdir(Path(__file__).parent)
@@ -22,7 +21,7 @@ def parse_args():
 
 
 def stop_script():
-    time.sleep(10)
+    os.system('pause')
     exit(1)
 
 
