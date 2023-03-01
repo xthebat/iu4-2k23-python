@@ -17,8 +17,12 @@ def main(args: list[str]) -> int:
     text = file.read()
     # считали файл
 
+    import re
+
     array_by_lines = text.split('\n')
-    array_by_word = text.split(' ')
+
+    array_by_word = re.findall(r'[^ \n]+|\n',text)
+    # array_by_word = text.split(' ')
 
     str1 = array_by_lines[0]
     str3 = array_by_lines[-1]
@@ -26,7 +30,7 @@ def main(args: list[str]) -> int:
     array2 = []
 
     n = 1
-    count = int(args[4])
+    count = int(args[4]) + 1
     print(count)
     pop_numbers = []
     b = 0
@@ -60,7 +64,7 @@ def main(args: list[str]) -> int:
     # count = count - len(str1)
     for i in range(len(array_by_word)):
         # i - кол слов
-        if count <= (len(array_by_word[i]) + 1):
+        if count <= (len(array_by_word[i])):
             count = int(args[4])
             n += 1
             print('\n' + "Substring #" + str(n))
@@ -74,23 +78,32 @@ def main(args: list[str]) -> int:
             # print(' here ')
             i = i - 1
             # i = i + 1
-            count = count - len(array_by_word[i + 1]) - 1
-            # i = i -1
-            # print(count)
+            # if array_by_word[i] == '\n':
+            #     count = count - len(array_by_word[i])
+            # else:
+            #     count = count - len(array_by_word[i]) - 1
+
+            count = count - len(array_by_word[i]) - 1
+        # i = i -1
+        #     print(count)
 
             # # print(text.split(' ')[0:i])
             # выводим сабстринг на каждые -n
         else:
 
+            if array_by_word[i] == '\n':
+                count = count - len(array_by_word[i])
+            else:
+                count = count - len(array_by_word[i]) - 1
 
-            count = count - len(array_by_word[i]) - 1
+
 
             # if array_by_word[i-1][0:1] == '@':
             #     i = i - 1
 
             print(array_by_word[i], end=' ')
             # print(count)
-            i += i
+            i += 1
                 # print(i)
 
     # print("NEW", end='\n\n\n\n\n\n\n\n')
@@ -111,13 +124,14 @@ def main(args: list[str]) -> int:
 
     # print(text[0:200])
     file.close()
+    print('\n\n')
     #
     # print("WAT", end='\n\n')
     # print(array2)
     # print(array_by_word[12])
     # print(len(array2))
     # print(len(array_by_word))
-    # print(array_by_word)
+    print(array_by_word)
     # print(len(array_by_word[3]))
     # print(len(array_by_word[7]))
     # print(array_by_word[11][0:1])
