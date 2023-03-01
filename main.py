@@ -2,40 +2,14 @@ import os.path
 import sys
 
 
-def find_d(args: list[str]):
-    if len(args) >= 2:
-        for index, it in enumerate(args):
-            if (it == '-d') & (len(args) > index):
+def find_arg(args: list[str], arg: str, return_param: int):
+    for index, it in enumerate(args):
+        if it == arg:
+            if return_param & (len(args) > index):
                 return args[index + 1]
-    return 0
-
-
-def find_l(args: list[str]):
-    if len(args) >= 2:
-        for index, it in enumerate(args):
-            if (it == '-l') & (len(args) > index):
-                return args[index + 1]
-    return 0
-
-
-def find_n(args: list[str]):
-    if len(args) >= 2:
-        for index, it in enumerate(args):
-            if (it == '-n') & (len(args) > index):
-                return int(args[index + 1])
-    else:
-        print('Вы не указали параметр -l')
-    return 200
-
-
-def find_file(args: list[str]):
-    if len(args) >= 2:
-        for index, it in enumerate(args):
-            if (it == '-f') & (len(args) > index):
-                return args[index + 1]
-    else:
-        print('Вы не указали параметр -f')
-    return 0
+            else:
+                return 1
+    return -1
 
 
 def write_substrings(string_list: list[str]):
@@ -54,14 +28,14 @@ def split_string(string: str, n: int):
         if substring.find("@") != -1:
             melt = 1
 
-        if (string_len + len(substring) < n) | melt == 1:
+        if ((string_len + len(substring)) < n) | melt == 1:
             string_len = string_len + len(substring) + 1
             new_str = new_str + ' ' + substring
         else:
             new_str_list.append(new_str)
             new_str = ""
             string_len = 0
-            
+
         if (substring.find(":") != -1) & melt:
             melt = 0
     return new_str_list
@@ -80,8 +54,8 @@ def read_file(filename: str):
 
 def main():
     print('dz_bat_1')
-    n = find_n(sys.argv)
-    filename = find_file(sys.argv)
+    n = int(find_arg(sys.argv, "-n", 1))
+    filename = find_arg(sys.argv, "-f", 1)
 
     print('Выбранный файл:', filename)
     print('Длина строки:', n)
