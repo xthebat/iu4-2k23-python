@@ -1,150 +1,160 @@
 from argparse import ArgumentParser, ArgumentError
 import os
 import re
-from typing import List
-import random
-import string
-from pathlib import Path
-
-os.chdir(Path(__file__).parent)
+import sys
 
 
-def parse_args():
+class PredicateError(Exception):
+    pass
+
+
+class InputArgumentError(Exception):
+    pass
+
+
+def parse_args(argv):
     parser = ArgumentParser(description='Преобразование строк в подстроки', exit_on_error=False)
     parser.add_argument('-f', '--filepath', type=str)
-    parser.add_argument('-n', '--limit', type=int, default=200)
+    parser.add_argument('-n', '--max-chars', type=int, default=200)
     parser.add_argument('-l', '--allow-splitting', action='store_true', default=False)
     parser.add_argument('-d', '--directory', type=str)
     parser.add_argument('-r', '--rule', type=str)
 
-    return parser.parse_args()
+    return parser.parse_args(argv[1:])
 
 
-def stop_script():
-    os.system('pause')
-    exit(1)
+def check_args(filepath: str, directory: str, max_chars: int):
+    if filepath is None:
+        raise FileNotFoundError("Не указан путь до файла. Измените параметр -f.")
 
+    if max_chars <= 0:
+        raise ValueError(f'Лимит слишком мал. Измените параметр -n.')
 
-try:
-    parse_args()
-except ArgumentError:
-    print("Указан неверный тип аргумента для одного из ключей. Перепроверьте их при запуске.")
-    stop_script()
+    if not os.path.isfile(filepath):
+        raise FileNotFoundError(
+            f'Указанного файла не существует по заданному пути ({filepath}). Измените параметр -f.')
 
-args = parse_args()
-
-
-def check_args():
-    if args.filepath is None:
-        print("Не указан путь до файла. Измените параметр -f.")
-        stop_script()
-
-    if not os.path.isfile(args.filepath):
-        print(f'Указанного файла не существует по заданному пути ({args.filepath}). Поменяйте параметр -f.')
-        stop_script()
-
-    if args.directory is not None and \
-            not os.path.isdir(args.directory):
-        print(f'Указанной папки не существует по заданному пути ({args.directory}). Пытаемся создать новую.')
+    if directory is not None and \
+            not os.path.isdir(directory):
         try:
-            os.mkdir(args.directory)
-        except OSError:
-            print("Не удалось создать папку по заданному пути. Поменяйте путь или название папки в параметре -d")
-            stop_script()
-
-    if args.limit <= 0:
-        print(f'Лимит слишком мал. Исправьте параметр -n.')
-        stop_script()
-
-
-def file_read() -> str:
-    with open(args.filepath, 'rb') as f:
-        current_string = f.read()
-        current_string = current_string.decode('utf-8', 'ignore')
-        return current_string
+            os.mkdir(directory)
+        except OSError as e:
+            raise e
 
 
 def split_string_list_to_words(
-        input_strings: List[str], max_chars=args.limit, restrict_middle_splitting=args.allow_splitting) -> List[str]:
+        input_strings: list[str], max_chars: int, allow_splitting: bool) -> list[str]:
     result_list = []
     current_substring = ''
 
     for word in input_strings:
         if len(current_substring) + len(word) <= max_chars:
-            current_substring += word + ("\n" if restrict_middle_splitting is True else " ")
+            current_substring += word + ("\n" if allow_splitting is True else " ")
         else:
             result_list.append(current_substring[:-1])
-            current_substring = word + ("\n" if restrict_middle_splitting is True else " ")
+            current_substring = word + ("\n" if allow_splitting is True else " ")
             continue
     result_list.append(current_substring[:-1])
     return result_list
 
 
-def check_string_limiter_args(lines: List[str], limit=args.limit):
+def check_string_limiter_args(lines: list[str], max_chars):
     for current_string in lines:
-        if len(current_string) > limit:
-            print("Невозможно разбить строку на подстроки. Лимит слишком мал. Исправьте параметр -n.")
-            stop_script()
+        if len(current_string) > max_chars:
+            raise ValueError("Невозможно разбить строку на подстроки. Лимит слишком мал. Измените параметр -n.")
 
 
-def divide_strings(
-        file_string: str, restrict_middle_splitting=args.allow_splitting) -> List[str]:
-    lines = file_string.splitlines()
-    keyword = "".join(random.choice(string.printable) for _ in range(10))
+def read_file(filepath: str) -> list[str]:
+    result_list = []
+    with open(filepath, 'r', encoding='utf-8') as f:
+        for line in f:
+            result_list.append(line.replace("\n", ""))
+    return result_list
 
-    for idx, current_line in enumerate(lines):
-        if args.rule is None:
+
+def divide_strings_from_file(allow_splitting: bool, filepath: str, rule: str, max_chars: int) -> list[str]:
+    substring_list = read_file(filepath)
+    keyword = "[this_is_a_keyword]"
+
+    for idx, current_line in enumerate(substring_list):
+        if rule is None:
             break
         try:
-            if eval(args.rule)(current_line):
-                lines[idx] = keyword + lines[idx]
-        except Exception as exc:
-            print(f"Вы неверно указали строку кода. Измените параметр -r."
-                  f"\nВведённый код: {args.rule}."
-                  f"\nОшибка, связанная с ним: {exc}")
-            stop_script()
+            predicate = eval(rule)
+            condition = predicate(current_line)
+        except Exception as e:
+            raise PredicateError(f"Вы неверно указали строку кода. Измените параметр -r."
+                                 f"\nВведённый код: {rule}.\nОшибка, связанная с ним: {e}")
 
-    if restrict_middle_splitting is False:
+        if condition and allow_splitting is False:
+            substring_list[idx] = keyword + substring_list[idx]
+
+    if allow_splitting is False:
         substrings = []
-        for x in lines:
-            substrings.append(x.strip(keyword) if keyword in x else x.split())
+        for x in substring_list:
+            (substrings.append(x.strip(keyword)) if keyword in x else substrings.extend(x.split()))
 
-        lines = substrings
+        substring_list = substrings
 
-    for idx, current_substring_part in enumerate(lines):
-        if re.search('^@', lines[idx]) and re.search(':$', lines[idx + 1]):
-            lines[idx] += f" {lines[idx + 1]}"
-            lines[idx + 1] = ""
+    for idx, current_substring_part in enumerate(substring_list):
+        if current_substring_part is not None and idx < len(substring_list) - 1 \
+                and re.search('^@', current_substring_part) and re.search(':$', substring_list[idx + 1]):
+            substring_list[idx] += f" {substring_list[idx + 1]}"
+            # noinspection PyTypeChecker
+            substring_list[idx + 1] = None
 
-    result_list = [specific_substring for specific_substring in lines if specific_substring != ""]
+    result_list = [specific_substring for specific_substring in substring_list if specific_substring is not None]
 
-    check_string_limiter_args(lines=result_list)
+    check_string_limiter_args(result_list, max_chars)
 
-    result_list = split_string_list_to_words(input_strings=result_list)
+    result_list = split_string_list_to_words(result_list, max_chars, allow_splitting)
 
     return result_list
 
 
-def print_substrings(redacted_string_list: List[str]):
+def print_substrings(redacted_string_list: list[str]):
     for idx, substring in enumerate(redacted_string_list):
         print(f'Substring №{idx + 1}:\n{substring}')
 
 
-def save_output_file(substrings: List[str], output_directory=args.directory):
+def save_output_file(substrings: list[str], directory: str):
     for idx, current_substring in enumerate(substrings):
-        with open(f"{output_directory}/substring_{idx + 1}", "w", encoding='utf-8') as f:
+        with open(f"{directory}/substring_{idx + 1}", "w", encoding='utf-8') as f:
             f.write(current_substring)
-            f.close()
 
 
-def main():
-    check_args()
-    cur_string = file_read()
-    divided_strings = divide_strings(file_string=cur_string)
-    print_substrings(divided_strings)
-    if args.directory is not None:
-        save_output_file(divided_strings)
+class SubstringGatherer:
+
+    def __init__(self, argv):
+        try:
+            args = parse_args(argv)
+        except ArgumentError as e:
+            raise InputArgumentError(f"\nНеверно указан параметр."
+                                     f"\nНеправильный параметр: {e.argument_name} "
+                                     f"\nОшибка, связанная с ним: {e}")
+        self.filepath = args.filepath
+        self.max_chars = args.max_chars
+        self.directory = args.directory
+        self.allow_splitting = args.allow_splitting
+        self.rule = args.rule
+
+    def main(self):
+
+        check_args(self.filepath, self.directory, self.max_chars)
+
+        result_substrings = divide_strings_from_file(self.allow_splitting, self.filepath, self.rule, self.max_chars)
+        print_substrings(result_substrings)
+        if self.directory is not None:
+            save_output_file(result_substrings, self.directory)
 
 
 if __name__ == '__main__':
-    main()
+    sg = SubstringGatherer(sys.argv)
+    sg.main()
+
+'''
+-f file.txt -n 60
+-f file.txt -n 200 -l -r "lambda line: len(line) == 45"
+-f file.txt -n 10
+-f file.txt -n 200 -r "lambda line: line.startswith('-')"
+'''
