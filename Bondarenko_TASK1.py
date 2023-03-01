@@ -24,13 +24,22 @@ def glue_nickname(file):
 
 
 def main(args: list[str]) -> int:
-    
+
     if args[1] == "-f":
         print(f"I have -f parameter={args[2]}")
     else:
         print("I have not -f parameter")
 
+    if args[4].isdigit() and int(args[4]) > 0:
+        print("-n parameter is correct")
+    else:
+        print('So sad, incorrect -n  parameter')
+        exit()
+
+    # if file.isfile('./input_file.txt'):
     file = open(args[2], "rt", encoding="utf-8")
+    # else:
+    #     print('So sad, so sad')
 
     text = file.read()
     # считали файл
