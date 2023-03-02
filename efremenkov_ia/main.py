@@ -94,7 +94,7 @@ def divide_strings_from_file(allow_splitting: bool, filepath: str, rule: str, ma
         substring_list = [item for sublist in substring_list for item in sublist]
 
     for idx, current_substring_part in enumerate(substring_list):
-        if current_substring_part is not None and idx < len(substring_list) - 1\
+        if current_substring_part is not None and idx < len(substring_list) - 1 \
                 and re.search('^@', current_substring_part) and re.search(':$', substring_list[idx + 1]):
             substring_list[idx] += f" {substring_list[idx + 1]}"
             # noinspection PyTypeChecker
@@ -120,34 +120,28 @@ def save_output_file(substrings: list[str], directory: str):
             f.write(current_substring)
 
 
-class SubstringSplitter:
+def get_args(argv):
+    try:
+        args = parse_args(argv)
+    except ArgumentError as e:
+        raise InputArgumentError(f"\nНеверно указан параметр."
+                                 f"\nНеправильный параметр: {e.argument_name} "
+                                 f"\nОшибка, связанная с ним: {e}")
+    return args
 
-    def __init__(self, argv):
-        try:
-            args = parse_args(argv)
-        except ArgumentError as e:
-            raise InputArgumentError(f"\nНеверно указан параметр."
-                                     f"\nНеправильный параметр: {e.argument_name} "
-                                     f"\nОшибка, связанная с ним: {e}")
-        self.filepath = args.filepath
-        self.max_chars = args.max_chars
-        self.directory = args.directory
-        self.allow_splitting = args.allow_splitting
-        self.rule = args.rule
 
-    def main(self):
+def main(args):
+    check_args(args.filepath, args.directory, args.max_chars)
 
-        check_args(self.filepath, self.directory, self.max_chars)
-
-        result_substrings = divide_strings_from_file(self.allow_splitting, self.filepath, self.rule, self.max_chars)
-        print_substrings(result_substrings)
-        if self.directory is not None:
-            save_output_file(result_substrings, self.directory)
+    result_substrings = divide_strings_from_file(args.allow_splitting, args.filepath, args.rule, args.max_chars)
+    print_substrings(result_substrings)
+    if args.directory is not None:
+        save_output_file(result_substrings, args.directory)
 
 
 if __name__ == '__main__':
-    sg = SubstringSplitter(sys.argv)
-    sg.main()
+    input_arguments = get_args(sys.argv)
+    main(input_arguments)
 
 '''
 -f file.txt -n 60
