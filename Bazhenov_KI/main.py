@@ -1,7 +1,8 @@
 import sys
 
 
-def processing_and_cropping_str(text, max_cnt, start_index, index_inc, l_rule):
+def processing_and_cropping_str(text, max_cnt, index_inc, l_rule):
+    start_index = 0
     cnt = start_index
     end_index = -1
     text_length = len(text)
@@ -24,14 +25,12 @@ def processing_and_cropping_str(text, max_cnt, start_index, index_inc, l_rule):
                             if text[cnt] == text[-1]:
                                 break
                         if cnt >= max_cnt and end_index == -1:
-                            print('Невозможно разделить следующую строку ')
                             return
                         if cnt >= max_cnt:
                             cnt = cnt_save + 1
                 elif temp == -1:
                     cnt += 1
                 elif end_index == -1:
-                    print('Невозможно разделить следующую строку ')
                     return
                 else:
                     one_of_lines = text[start_index:end_index]
@@ -45,12 +44,13 @@ def processing_and_cropping_str(text, max_cnt, start_index, index_inc, l_rule):
             else:
                 cnt += 1
         if end_index == -1:
-            print('Невозможно разделить строку')
             return
         one_of_lines = text[start_index:end_index]
         list_of_str.append(one_of_lines)
         start_index = end_index + 1
+        end_index = -1
         max_cnt = start_index + index_inc
+        cnt = start_index
     return list_of_str
 
 
@@ -71,7 +71,6 @@ def main() -> int:
     l_rule = 0
     d_rule = 0
     file_dir = []
-    print('Введите -f "путь к файлу" -n "Максимальное количество символов"')
     if len(sys.argv) == 1 or sys.argv.index('-f') == -1 or sys.argv.index('-n') == -1:
         print('Введены недопустимые параметры. Введите -f "путь к файлу" -n "Максимальное количество символов" -l -d')
         return 0
@@ -89,10 +88,10 @@ def main() -> int:
     index_inc = max_cnt
     with open(file_path, "r") as file:
         text = file.read()
-    start_index = 0
-    list_of_str = processing_and_cropping_str(text, max_cnt, start_index, index_inc, l_rule)
+    list_of_str = processing_and_cropping_str(text, max_cnt, index_inc, l_rule)
     if list_of_str is None:
-        return 0
+        print('Невозможно разделить следующую строку')
+        exit(-1)
     print_string(list_of_str, d_rule, file_dir)
     print('Строки разделены')
 
