@@ -1,9 +1,9 @@
+import os.path
 import re
 import sys
-
 import click
-import os.path
-import typing
+
+from typing import Iterator, Optional
 
 
 @click.command()
@@ -12,7 +12,7 @@ import typing
 @click.option("-l", "skip_score", is_flag=True, help="Split score")
 @click.option("-d", "target_directory", help="Directory to save substrings")
 @click.option(
-    "-r", "protecting_expression",
+    "-r", "deprecating_expression",
     help="Expression to protect line from breaking"
 )
 def main(
@@ -20,7 +20,7 @@ def main(
     max_len: int,
     skip_score: bool,
     target_directory: str,
-    protecting_expression: str,
+    deprecating_expression: str,
 ):
     """Main program entrypoint."""
 
@@ -31,16 +31,16 @@ def main(
         print(f"Can't read input file '{file_path}'")
         sys.exit(os.EX_NOINPUT)
 
-    protection_checker = None
-    if protecting_expression:
+    deprecation_checker = None
+    if deprecating_expression:
         try:
-            protection_checker = eval(protecting_expression)
-        except Exception:
-            print(f"Can't interpret '{protecting_expression}'")
+            deprecation_checker = eval(deprecating_expression)
+        except Exception as error:
+            print(f"Can't interpret '{deprecating_expression}':  {error}")
             sys.exit(os.EX_DATAERR)
 
     breakpoints_iterator = iterate_breakpoint_indexes(
-        file_text, skip_score, protection_checker
+        file_text, skip_score, deprecation_checker
     )
 
     breakpoint_indexes = collect_breakpoint_indexes(max_len, breakpoints_iterator)
@@ -56,7 +56,7 @@ def main(
     print_substrings(substrings, target_directory)
 
 
-def print_substrings(substrings: typing.List[str], directory: str):
+def print_substrings(substrings: list[str], directory: str):
     """Print substrings in appropriate format."""
 
     for idx, substring in enumerate(substrings, 1):
@@ -65,15 +65,13 @@ def print_substrings(substrings: typing.List[str], directory: str):
             with open(os.path.join(directory, substring_name), "w") as file:
                 file.write(substring)
         else:
-            print(substring_name)
-            print(substring)
-            print()
+            print(substring_name, substring, "\n")
 
 
 def create_substrings(
     text: str,
-    breakpoint_indexes: typing.List[int],
-) -> typing.List[str]:
+    breakpoint_indexes: list[int],
+) -> list[str]:
     """Break text into substrings."""
 
     substrings = []
@@ -84,32 +82,37 @@ def create_substrings(
     return substrings
 
 
+def is_deprecated(line, deprecation_checker: Optional[callable] = None) -> bool:
+    """Check if line is deprecated."""
+
+    if deprecation_checker:
+        try:
+            return deprecation_checker(line)
+        except Exception as error:
+            print(f"Error in deprecating expression: {error}")
+            sys.exit(os.EX_DATAERR)
+
+    return False
+
+
 def iterate_breakpoint_indexes(
     text: str,
     split_scores: bool = False,
-    protection_checker: typing.Optional[typing.Callable] = None,
-) -> typing.Iterator[int]:
+    deprecation_checker: Optional[callable] = None,
+) -> Iterator[int]:
     """Iterator on text breakpoint indexes."""
 
     score_template = "- Новый score пользователя @"
     current_index = -1
 
-    for line in text.split("\n"):
-        is_protected = False
-        if protection_checker:
-            try:
-                is_protected = protection_checker(line)
-            except Exception:
-                print("Error in protecting expression")
-                sys.exit(os.EX_DATAERR)
-
-        if split_scores and re.match(score_template, line) or is_protected:
+    for line in text.splitlines():
+        if split_scores and re.match(score_template, line) or is_deprecated(line, deprecation_checker):
             current_index += len(line)
         else:
             is_tag = False
             for symbol in line:
                 current_index += 1
-                if symbol in (" ", "\t") and not is_tag:
+                if symbol.isspace() and not is_tag:
                     yield current_index
                 elif symbol == "@":
                     is_tag = True
@@ -122,8 +125,8 @@ def iterate_breakpoint_indexes(
 
 def collect_breakpoint_indexes(
     max_len: int,
-    break_points_iterator: typing.Iterator[int],
-) -> typing.List[int]:
+    break_points_iterator: Iterator[int],
+) -> list[int]:
     """Collect appropriate indexes to make a line break."""
 
     breakpoint_indexes = []
