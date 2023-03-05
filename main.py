@@ -2,7 +2,7 @@ import argparse
 import os
 
 
-def add_parser_args(parser: argparse.ArgumentParser):
+def add_parser_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         '-f',
         type=str,
