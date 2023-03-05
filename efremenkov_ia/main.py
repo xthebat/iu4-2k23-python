@@ -13,14 +13,19 @@ class InputArgumentError(Exception):
 
 
 def parse_args(argv):
-    parser = ArgumentParser(description='Преобразование строк в подстроки', exit_on_error=False)
-    parser.add_argument('-f', '--filepath', type=str)
-    parser.add_argument('-n', '--max-chars', type=int, default=200)
-    parser.add_argument('-l', '--allow-splitting', action='store_true', default=False)
-    parser.add_argument('-d', '--directory', type=str)
-    parser.add_argument('-r', '--rule', type=str)
-
-    return parser.parse_args(argv[1:])
+    try:
+        parser = ArgumentParser(description='Преобразование строк в подстроки', exit_on_error=False)
+        parser.add_argument('-f', '--filepath', type=str)
+        parser.add_argument('-n', '--max-chars', type=int, default=200)
+        parser.add_argument('-l', '--allow-splitting', action='store_true', default=False)
+        parser.add_argument('-d', '--directory', type=str)
+        parser.add_argument('-r', '--rule', type=str)
+        args = parser.parse_args(argv[1:])
+    except ArgumentError as e:
+        raise InputArgumentError(f"\nНеверно указан параметр."
+                                 f"\nНеправильный параметр: {e.argument_name} "
+                                 f"\nОшибка, связанная с ним: {e}")
+    return args
 
 
 def check_args(filepath: str, directory: str, max_chars: int):
@@ -90,8 +95,11 @@ def divide_strings_from_file(allow_splitting: bool, filepath: str, rule: str, ma
             substring_list[idx] = keyword + substring_list[idx]
 
     if allow_splitting is False:
-        substring_list = [(x.strip(keyword) if keyword in x else x.split()) for x in substring_list]
-        substring_list = [item for sublist in substring_list for item in sublist]
+        sublist = []
+        for x in substring_list:
+            sublist.append(x.strip(keyword)) if keyword in x else sublist.extend(x.split())
+
+        substring_list = sublist
 
     for idx, current_substring_part in enumerate(substring_list):
         if current_substring_part is not None and idx < len(substring_list) - 1 \
@@ -120,16 +128,6 @@ def save_output_file(substrings: list[str], directory: str):
             f.write(current_substring)
 
 
-def get_args(argv):
-    try:
-        args = parse_args(argv)
-    except ArgumentError as e:
-        raise InputArgumentError(f"\nНеверно указан параметр."
-                                 f"\nНеправильный параметр: {e.argument_name} "
-                                 f"\nОшибка, связанная с ним: {e}")
-    return args
-
-
 def main(args):
     check_args(args.filepath, args.directory, args.max_chars)
 
@@ -140,12 +138,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    input_arguments = get_args(sys.argv)
+    input_arguments = parse_args(sys.argv)
     main(input_arguments)
-
-'''
--f file.txt -n 60
--f file.txt -n 200 -l -r "lambda line: len(line) == 45"
--f file.txt -n 10
--f file.txt -n 200 -r "lambda line: line.startswith('-')"
-'''

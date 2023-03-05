@@ -1,22 +1,24 @@
 import unittest
 from main import parse_args, main
 import shlex
-from main import ArgumentError
+from main import InputArgumentError, PredicateError
+import os
 
 
 class TestSplitter(unittest.TestCase):
 
-    def test_main_with_args(self, test_cases: list[tuple], assert_equals: bool):
+    def _create_subtest_with_args(self, test_cases: list[tuple], assert_method: bool):
 
         for arg, expected in test_cases:
             with self.subTest(arg=arg, expected=expected):
-                parsed_args = shlex.split(arg)
-                parsed_args.insert(0, "'F:\\python\\iu4-2k23-python\\efremenkov_ia\\main.py'")
-                parsed_args = parse_args(parsed_args)
-                if assert_equals is True:
-                    self.assertEqual(main(parsed_args), expected)
+                execution_args = shlex.split(arg)
+                execution_folder = f"{os.path.dirname(os.path.abspath(__file__)) + 'main.py'}"
+                execution_args.insert(0, execution_folder)
+                if assert_method:
+                    self.assertEqual(expected, main(parse_args(execution_args)))
                 else:
-                    self.assertRaises(expected, main(parsed_args))
+                    with self.assertRaises(expected):
+                        main(parse_args(execution_args))
 
     def test_asserts(self):
         test_cases = [
@@ -26,15 +28,16 @@ class TestSplitter(unittest.TestCase):
             ('-f file.txt -n 110 -d foldername', None),
             ('-f file.txt -l', None),
         ]
-        self.test_main_with_args(test_cases, True)
+        self._create_subtest_with_args(test_cases, True)
 
     def test_raises(self):
         test_cases = [
-            ('-f file.txt -n s', ArgumentError),
+            ('-f file.txt -n s', InputArgumentError),
             ('-f file.txt -n 0', ValueError),
-            ('-f files.txt', FileNotFoundError)
+            ('-f files.txt', FileNotFoundError),
+            ('-f file.txt -n 200 -l -r "lambd line: len(line) == 45"', PredicateError)
         ]
-        self.test_main_with_args(test_cases, False)
+        self._create_subtest_with_args(test_cases, False)
 
 
 if __name__ == "__main__":
