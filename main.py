@@ -2,7 +2,7 @@ import argparse
 import os
 
 
-def add_parser_args(parser):
+def add_parser_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         '-f',
         type=str,
@@ -26,7 +26,7 @@ def add_parser_args(parser):
     )
 
 
-def process_file(input, max_num):
+def process_file(input: str, max_num: int) -> list[str]:
     result = []
 
     i = 0
@@ -34,13 +34,8 @@ def process_file(input, max_num):
         if i + max_num >= len(input):
             result.append(input[i:])
             break
-
-        if input[i + max_num] == ' ':
-            result.append(input[i : i + max_num])
-            i = i + max_num
-            continue
-
-        i_space = input.rfind(' ', i, i + max_num)
+        
+        i_space = input.rfind(' ', i + 1, i + max_num)
         if i_space == -1:
             print('Не удалось разбить входную строку')
             return []
@@ -51,20 +46,17 @@ def process_file(input, max_num):
     return result
 
 
-def print_s(substrings):
-    i = 1
-    for s in substrings:
-        print(f'Substring #{i}:')
-        print(s)
-        i += 1
+def print_substrings(substrings: list[str]) -> None:
+    for index, substr in enumerate(substrings):
+        print(f'Substring #{index}:')
+        print(substr)
 
 
-def write_s(substrings, dirpath):
-    i = 1
-    for s in substrings:
-        with open(os.path.join(dirpath, f'substring_{i}.txt'), 'wt') as fout:
-            fout.write(s)
-        i += 1
+def write_substrings(substrings: list[str], dirpath: str) -> None:
+    for index, substr in enumerate(substrings):
+        filepath = os.path.join(dirpath, f'substring_{index}.txt')
+        with open(filepath, 'wt') as fout:
+            fout.write(substr)
 
 
 def main():
@@ -74,24 +66,24 @@ def main():
 
     if args.max_num <= 0:
         print('Длина строки должна быть больше 0')
-        return
+        return -1
 
     if not os.path.exists(args.filepath):
         print('Путь к файлу указан не правильно или файл не существует')
-        return
+        return -1
 
     if args.dirpath and not os.path.exists(args.dirpath):
         print('Директория указана не правильно')
-        return
+        return -1
 
     with open(args.filepath, 'rt') as fin:
         input = fin.read()
 
     substrings = process_file(input, args.max_num)
     if args.dirpath:
-        write_s(substrings, args.dirpath)
+        write_substrings(substrings, args.dirpath)
     else:
-        print_s(substrings)
+        print_substrings(substrings)
 
 
 if __name__ == '__main__':
