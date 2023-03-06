@@ -1,13 +1,16 @@
 import sys
 
+MIN_LEN_ARG = 3
+MAX_LEN_ARG = 5
 
 def main(args: list[str]) -> int:
-    control_len(args)
-    list_flag = find_flags(args)
-    control_txt(list_flag[0])
-    all_words = reader(list_flag[0])
-    changed_list = word_breaking(all_words, list_flag[1])
-    make_and_print_words(changed_list, list_flag[1])
+    control_arg_len(args)
+    tuple_flag = find_flags(args)
+    control_type_file_txt(tuple_flag[0])
+    all_words = reader(tuple_flag[0])
+    changed_list = word_breaking(all_words, tuple_flag[1])
+    make_and_print_words(changed_list, tuple_flag[1])
+    return 1
 
 
 # функция считывающая файл
@@ -28,54 +31,53 @@ def word_breaking(args: str, n: int) -> list[str]:
 
 
 # Проверка длины параметра
-def control_len(args: str):
-    if len(args) < 2:
-        print(f"Не достаточно аргументов параметра = {len(args)}, необходимо > 2")
-        return -1
-    elif len(args) > 5:
-        print(f"Слишком большая длина параматра = {len(args) - 1}, необходимо < 5")
-        return -1
+def control_arg_len(args: list[str]):
+    if len(args) < MIN_LEN_ARG:
+        print(f"Не достаточно аргументов параметра = {len(args) - 1}, необходимо > {MIN_LEN_ARG - 2}")
+        sys.exit(-1)
+    elif len(args) > MAX_LEN_ARG:
+        print(f"Слишком большая длина параметра = {len(args) - 1}, необходимо < {MAX_LEN_ARG}")
+        sys.exit(-1)
 
 
 # ищем флаги -f -n
-def find_flags(args: str):
+def find_flags(args: str) -> tuple:
     n = 200
-    for i in range(len(args)):
-        if args[i] == '-f':
+    for i, val in enumerate(args):
+        if val == '-f':
             path_file = args[i + 1]
-        elif args[i] == '-n':
+        elif val == '-n':
             n = int(args[i + 1])
-    return [path_file, n]
+    return (path_file, n)
 
 
 # проверка разрешения файла на .txt
-def control_txt(args: str):
+def control_type_file_txt(args: str):
     if len(args) >= 5:
-        if args[-1] != "t" or args[-2] != "x" or args[-3] != "t" or args[-4] != ".":
+        if not args.endswith('.txt'):
             print("Неверное разрешение файла, введите .txt")
-            return -1
+            sys.exit(-1)
     else:
         print("Некорректное имя файла")
-        return -1
+        sys.exit(-1)
 
 
 # склейка никнеймов
 def glue_nicks(args: str) -> list:
     changed_list = args.split(" ")
     list_delete_words = []
-    for i in range(len(changed_list)):
-        if "@" in changed_list[i] and ":" not in changed_list[i]:
-            nickname = changed_list[i]
+    for i, val in enumerate(changed_list):
+        if "@" in val and ":" not in val:
+            nickname = val
             a = i
             while True:
+                list_delete_words.append(changed_list[a + 1])
                 if ":" not in changed_list[a + 1]:
-                    nickname = nickname + " " + changed_list[a + 1]
-                    list_delete_words.append(changed_list[a + 1])
+                    nickname += " " + changed_list[a + 1]
                     a += 1
                 else:
-                    nickname = nickname + " " + changed_list[a + 1]
-                    changed_list[i] = nickname
-                    list_delete_words.append(changed_list[a + 1])
+                    nickname += " " + changed_list[a + 1]
+                    changed_list[a] = nickname
                     break
 
     for i, word in enumerate(list_delete_words):
@@ -85,9 +87,9 @@ def glue_nicks(args: str) -> list:
 
 
 # проверка на делимость строки
-def word_output_control(my_list: list[str], n: int):
-    for i in range(len(my_list)):
-        if len(my_list[i]) > n:
+def word_output_control(my_list: tuple, n: int):
+    for i, val in enumerate(my_list):
+        if len(val) > n:
             print(f"Невозможно разделить на подстроки")
             sys.exit(-1)
 
@@ -98,7 +100,7 @@ def make_and_print_words(my_list: list[str], n: int):
     glued_string = my_list[0]
     for i in range(len(my_list) - 1):
         if len(glued_string) + len(my_list[i + 1]) < n - 1:
-            glued_string = glued_string + ' ' + my_list[i + 1]
+            glued_string += ' ' + my_list[i + 1]
         else:
             printing_string(a, glued_string)
             glued_string = my_list[i + 1]
@@ -113,3 +115,4 @@ def printing_string(i: int, args: str):
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))
+
