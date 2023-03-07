@@ -114,7 +114,7 @@ def substring_create(split_arr: list[str], sym_limit: int, flag_l: bool):
                 else:
                     # если строка длинная, то нужно провести вышеописанные операции в цикле несколько раз
                     i -= 1
-
+ 
             # Если можно добавить всю строку, то сразу добавляем в подстроку
             else:
                 result_arr[substring_num] += split_arr[i] + '\n'
