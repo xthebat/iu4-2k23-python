@@ -6,10 +6,7 @@ from itertools import groupby
 # функция проверяет размер файла
 def file_size(filename: str) -> bool:
     file_size_content = os.path.getsize(filename)
-    if 0 == file_size_content:
-        return False
-    else:
-        return True
+    return 0 == file_size_content
 
 
 # функция чтения файла
@@ -25,7 +22,6 @@ def read_file(file_name: str) -> list[str]:
             return file_content
         else:
             print("This file is empty")
-        file.close()
 
 
 # функция печати подстрок
@@ -122,7 +118,6 @@ def split_string(file: str, split_number: int, status: bool) -> list[str]:
         i = 0
         j = 0
         current_index = 0
-        index_symbol_end = 0
 
         while i < split_number:
             i += 1
@@ -224,12 +219,11 @@ def split_string(file: str, split_number: int, status: bool) -> list[str]:
 # Пока считаю, что пользователь сам знает, чего он хочет и вводит код в качестве параметра,
 # а мой код его исполняет
 
-def begin_code(input_list: list[str], input_code: str) -> list[str]:
-    temp_list = []
+def begin_code(input_list: list[str], input_code: str) -> bool:
     for element in input_list:
-        exec(input_code)
-        temp_list.append(element)
-    return temp_list
+        code_string = eval(input_code)
+        status = (code_string(element))
+        return status
 
 
 def main() -> None:
@@ -281,7 +275,7 @@ def main() -> None:
         list_strings = split_string(sys.argv[argv_f + 1], split_number, status)
 
         if -1 != argv_r:
-            list_strings = begin_code(list_strings, sys.argv[argv_r + 1])
+            status_code = begin_code(list_strings, sys.argv[argv_r + 1])
         else:
             pass
 
