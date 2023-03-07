@@ -25,7 +25,7 @@ def main(
     """Main program entrypoint."""
 
     try:
-        with open(file_path, "r") as file:
+        with open(file_path, "rt", encoding="utf-8") as file:
             file_text = file.read()
     except OSError:
         print(f"Can't read input file '{file_path}'")
@@ -62,7 +62,7 @@ def print_substrings(substrings: list[str], directory: str):
     for idx, substring in enumerate(substrings, 1):
         substring_name = f"Substring #:{idx}"
         if directory:
-            with open(os.path.join(directory, substring_name), "w") as file:
+            with open(os.path.join(directory, substring_name), "wt", encoding="utf-8") as file:
                 file.write(substring)
         else:
             print(substring_name, substring, "\n")
