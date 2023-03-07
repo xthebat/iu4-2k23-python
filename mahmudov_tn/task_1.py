@@ -1,33 +1,24 @@
 import os
-import sys
-
-INDEX = 1
+import argparse
 
 
-def output_substring(arguments, substrings):
-    global INDEX
-    for substring in substrings:
-        if arguments['dir'] and os.path.exists(arguments['path']):
-            with open(f"{arguments['dir']}\\substring_#{INDEX}.txt", 'w+') as file:
-                file.write(substring.strip())
-                INDEX += 1
-                continue
-        print(f'Substring #{INDEX}:\n{substring.strip()}')
-        INDEX += 1
+def write_file(filename, substring, index):
+    with open(filename, 'w+', encoding='UTF8') as file:
+        file.write(substring.strip())
+        index += 1
+    return index
 
 
-def work_string(arguments, string):
+def work_string(num, string):
     substrings = []
     string_buff = ''
     words = string.split()
     for word in words:
-        if 'score' in string and '@' in word:
+        if 'score' in string and '@' in word and ':' in word:
             string_buff += f'{word} '
-        elif 'score' in string and ':' in word:
+        elif len(string_buff) <= num:
             string_buff += f'{word} '
-        elif len(string_buff) <= arguments['num']:
-            string_buff += f'{word} '
-            if len(string_buff) >= arguments['num']:
+            if len(string_buff) >= num:
                 substrings.append(string_buff)
                 string_buff = ''
             elif word == words[len(words) - 1]:
@@ -36,27 +27,41 @@ def work_string(arguments, string):
         else:
             substrings.append(string_buff)
             string_buff = ''
-    output_substring(arguments, substrings)
+    return substrings
 
 
-def work_file(arguments):
-    with open(arguments['path'], 'r') as file:
+def parse_line(arguments):
+    index = 1
+    if not os.path.exists(arguments.path):
+        print(f"File{arguments.path} not found!")
+        exit()
+    with open(arguments.path, 'r', encoding='UTF8') as file:
         for string in file.read().split('\n'):
-            if string:
-                if arguments['row'] and 'score' in string:
-                    output_substring(arguments, [string])
+            if not string:
+                continue
+            if arguments.row and 'score' in string:
+                if arguments.dir and os.path.exists(arguments.path):
+                    index = write_file(f"{arguments.dir}\\substring_#{index}.txt", substring, index)
                     continue
-                work_string(arguments, string)
+                print(f'Substring #{index}:\n{string.strip()}')
+                index += 1
+                continue
+            substrings = work_string(arguments.num, string)
+            for substring in substrings:
+                if arguments.dir and os.path.exists(arguments.path):
+                    index = write_file(f"{arguments.dir}\\substring_#{index}.txt", substring, index)
+                    continue
+                print(f'Substring #{index}:\n{substring.strip()}')
+                index += 1
 
 
 def main():
-    arguments = {
-        'path': sys.argv[2],
-        'num': int(sys.argv[4]) if '-n' in sys.argv else int(200),
-        'row': True if '-l' in sys.argv else False,
-        'dir': sys.argv[7] if '-d' in sys.argv else None
-    }
-    work_file(arguments)
+    arguments = argparse.ArgumentParser()
+    arguments.add_argument("-f", type=str, dest="path")
+    arguments.add_argument("-n", type=int, default=200, dest="num")
+    arguments.add_argument("-l", action="store_true", dest="row")
+    arguments.add_argument("-d", type=str, dest="dir")
+    parse_line(arguments.parse_args())
 
 
 if __name__ == '__main__':
