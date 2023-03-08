@@ -132,9 +132,6 @@ def file_handling(options):
             if line == '\n':
                 continue
             for substring in line_separator(line, options):
-                # Checking for the correctness of the -d argument
-                # and for the existence of a directory. If the directory does not exist,
-                # the result will be printed to the console.
                 if not options.dir:
                     print(f'Substring #{count}:\n\t{substring.strip()}')
                     count += 1
