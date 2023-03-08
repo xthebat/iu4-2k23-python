@@ -129,7 +129,7 @@ def file_handling(options):
                 print(f'\t{line.strip()}')
             return
         for line in source_file:
-            if line == '\n':
+            if not line.strip():
                 continue
             for substring in line_separator(line, options):
                 if not options.dir:
