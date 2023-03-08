@@ -97,7 +97,7 @@ def line_separator(line, options):
         result.append(line.strip())
     else:
         for word in s_line:
-            if word.find('@') != -1 or line.find('@') != -1 and word.find(':') != -1:
+            if word.find('@') != -1 or word.find(':') != -1 and line.find('@') != -1:
                 substring = ' '.join([substring, word])
                 idx += 1
                 continue
