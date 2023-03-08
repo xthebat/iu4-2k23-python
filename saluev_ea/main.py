@@ -64,12 +64,14 @@ def get_arguments():
     return arguments
 
 
-def line_separator(line, options):
-    idx = 0  # index of a letter in the string
-    result = []  # Substring array
-    substring = ''
-    s_line = line.split()
+def write_file(options, substring, count):
+    with open(f"{options.dir}/substring_#{count}.txt", 'w+') as wfile:
+        wfile.write(substring)
+    count += 1
+    return count
 
+
+def separation_ban(options, line):
     # Functionality [-r] check
     try:
         func = eval(options.row)
@@ -77,19 +79,32 @@ def line_separator(line, options):
         raise CantEvaluate(options.row) from error
 
     if func(line):
-        result.append(line)
+        return line.strip()
+
+
+def line_separator(line, options):
+    idx = 0  # index of a letter in the string
+    result = []  # Substring array
+    substring = ''
+    s_line = line.split()
+
+    if options.row:
+        line_ban = separation_ban(options, line)
+        if line_ban:
+            result.append(line_ban)
+        return
     elif options.lrz and line.find('@') != -1:
-        result.append(line)
+        result.append(line.strip())
     else:
         for word in s_line:
-            if word.find('@') != -1:
-                substring += f'{word} {s_line[idx+1]} '
+            if word.find(' @') != -1:
+                substring = ' '.join([substring, word, s_line[idx+1]])
                 idx += 1
                 continue
-            elif word.find(':') != -1:
+            if word.find(': ') != -1:
                 idx += 1
                 continue
-            substring += f'{word} '
+            substring = ' '.join([substring, word])
             if len(substring) >= options.num:
                 result.append(substring)
                 substring = ''
@@ -104,34 +119,35 @@ def file_handling(options):
     count = 1
     with open(options.source, 'rt') as source_file:
         if os.stat(options.source).st_size == 0:
-            print("File is empty.")
-            return
-        elif options.num in [0, 1]:
-            print(f'Substring #{count}:\n')
+            exit('File is empty.')
+        if options.num == 0:
+            if options.dir:
+                write_file(options, source_file.read().strip(), count)
+                return
+            print(f'Substring #{count}:')
             for line in source_file:
-                print(f'\t{line.strip()}\n')
+                print(f'\t{line.strip()}')
             return
         for line in source_file:
+            if line == '\n':
+                continue
             for substring in line_separator(line, options):
                 # Checking for the correctness of the -d argument
                 # and for the existence of a directory. If the directory does not exist,
                 # the result will be printed to the console.
                 if not options.dir:
-                    print(f'Substring #{count}:\n\t{substring.strip()}\n')
-                else:
-                    if os.path.exists(options.dir):
-                        with open(f"{options.dir}/substring_#{count}.txt", 'w+') as wfile:
-                            wfile.write(substring)
-                    else:
-                        print(f'Path {options.dir} does not exist\n')
-                count += 1
+                    print(f'Substring #{count}:\n\t{substring.strip()}')
+                    count += 1
+                    continue
+                count = write_file(options, substring, count)
 
 
 def main():
     options = get_arguments().parse_args()
-    if not options.source or not os.path.exists(options.source):  # Checking for the existence of a file
-        print(f'File {options.source} not exist!\n')
-        return
+    if not options.source or not os.path.exists(options.source):
+        exit(f'File {options.source} not exist!\n')
+    if options.dir is not None and not os.path.exists(options.dir):
+        exit(f'Path {options.dir} does not exist\n')
     file_handling(options)
 
 
