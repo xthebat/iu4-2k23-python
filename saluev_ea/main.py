@@ -100,6 +100,12 @@ def line_separator(line, options):
             if word.find('@') != -1 or word.find(':') != -1 and line.find('@') != -1:
                 substring = ' '.join([substring, word])
                 idx += 1
+                # Checks for the total length of the user tag.
+                # If the length is longer than specified (e.g.: 1),
+                # the substring will be added to the substring list and then reset to zero.
+                if substring.find(':') != -1 and len(substring) >= options.num:
+                    result.append(substring)
+                    substring = ''
                 continue
             substring = ' '.join([substring, word])
             if len(substring) >= options.num:
