@@ -97,11 +97,11 @@ def line_separator(line, options):
         result.append(line.strip())
     else:
         for word in s_line:
-            if word.find(' @') != -1:
+            if line.find('score') != -1 and word.find('@') != -1:
                 substring = ' '.join([substring, word, s_line[idx+1]])
                 idx += 1
                 continue
-            if word.find(': ') != -1:
+            if line.find('score') != -1 and word.find(':') != -1:
                 idx += 1
                 continue
             substring = ' '.join([substring, word])
