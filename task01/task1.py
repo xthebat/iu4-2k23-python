@@ -11,27 +11,44 @@ def parse_arguments():
     return vars(parser.parse_args())
 
 
+def get_tag_indexes(text:str, start=0, end=None):
+    if end == None:
+        end = len(text)
+    start_tag = text.rfind('@', start, end)
+    if start_tag != -1:
+
+        space_was_found = False
+        for i in range(start_tag, len(text)):
+            if text[i] == ':':
+                return start_tag, i
+            if text[i] == ' ' and not space_was_found:
+                space_was_found = True
+                continue
+            if text[i].isspace() and text[i] != ' ':
+                return start_tag, i - 1
+            if text[i].isspace() and space_was_found:
+                return start_tag, i - 1
+        return start_tag, end
+    return 0, 0
+
+
 def split_the_string(text:str, part_length:int):
     left = 0
     right = part_length
 
-    result = []
-
     if part_length >= len(text):
-        result.append(text)
-        return result
+        yield text
 
     while True:
         if right >= len(text):
-            result.append(text[left:])
+            yield text[left:]
             break
+
         text_part = text[left:right]
 
         if text_part == '':
-            return result
+            break
         
-        
-
         if not text_part[-1].isspace() and not text[right].isspace():
             start_words_index = 0
             for i in reversed(range(len(text_part))):
@@ -48,35 +65,15 @@ def split_the_string(text:str, part_length:int):
                 right = start_words_index
             text_part = text[left:right]
 
-        start_tag = text.rfind('@', left, right)
-        end_tag = 0
-        if start_tag != -1:
-
-            space_was_found = False
-            for i in range(start_tag, len(text)):
-                if text[i] == ':':
-                    end_tag = i + 1
-                    break
-                if text[i] == ' ' and not space_was_found:
-                    space_was_found = True
-                    continue
-                if text[i].isspace() and text[i] != ' ':
-                    end_tag = i
-                    break
-                if text[i].isspace() and space_was_found:
-                    end_tag = i
-                    break
+            start_tag, end_tag = get_tag_indexes(text, left, right)
             
             if end_tag > right:
                 right = start_tag
                 text_part = text[left:right]
 
-        result.append(text_part)
         left = right
         right = left + part_length
-    return result
-
-
+        yield text_part
 
 
 def main():
@@ -93,7 +90,8 @@ def main():
     text_parts = split_the_string(text_data, n)
     
     
-    for k, part in enumerate(text_parts, 1):
+    for k, part in enumerate(split_the_string(text_data, n), 1):
+
         print(f"Substring #{k}", part, sep='\n')
 
 
