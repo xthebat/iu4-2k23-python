@@ -11,44 +11,43 @@ def parse_arguments():
     return vars(parser.parse_args())
 
 
-def split_the_string(text_words:str, n:int):
+def split_the_string(text:str, part_length:int):
     left = 0
-    right = n
+    right = part_length
 
     result = []
 
-    if n >= len(text_words):
-        result.append(text_words)
+    if part_length >= len(text):
+        result.append(text)
         return result
 
     while True:
-        if right >= len(text_words):
-            result.append(text_words[left:])
+        if right >= len(text):
+            result.append(text[left:])
             break
-        text_part = text_words[left:right]
+        text_part = text[left:right]
 
         if text_part == '':
             return result
 
-        if text_part[-1] != ' ' and text_part[-1] != '\t' and text_part[-1] != '\n' and \
-                text_words[right] != ' ' and text_words[right] != '\t' and text_words[right] != '\n':
+        if not text_part[-1].isspace() and not text[right].isspace():
             start_words_index = 0
             for i in reversed(range(len(text_part))):
-                if text_part[i] == ' ' or text_part[i] == '\t' or text_part[i] == '\n':
+                if text_part[i].isspace():
                     start_words_index = left + i + 1
                     break
             end_words_index = 0
-            for i in range(start_words_index, len(text_words)):
-                if text_words[i] == ' ' or text_words[i] == '\t' or text_words[i] == '\n':
+            for i in range(start_words_index, len(text)):
+                if text[i].isspace():
                     end_words_index = i
                     break
             if end_words_index >= right and left != start_words_index:
                 right = start_words_index
-            text_part = text_words[left:right]
+            text_part = text[left:right]
 
         result.append(text_part)
         left = right
-        right = left + n
+        right = left + part_length
     return result
 
 
