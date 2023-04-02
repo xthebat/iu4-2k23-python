@@ -1,5 +1,21 @@
 from dataclasses import dataclass
 
+class Compiler:
+    def set_json(self, filename input):
+    ...
+def get_json(self, filename output):
+...
+def parse(self, filename input):
+...
+def print(self):
+    ...
+Function: dict
+Variable: dict
+Ifdef: dict
+Include: dict
+SyntaxError: dict
+
+
 @dataclass
 class Function(Compiler):
     name: str
