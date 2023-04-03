@@ -35,3 +35,4 @@ class ParsTypedef:
         typedef = Typedef(self.find_typedef_line(),
                           self.find_typedef_type(),
                           self.find_typedef_new_name())
+        return typedef
