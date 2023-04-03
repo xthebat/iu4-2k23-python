@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from function_pars.func_parsing import Function
-#from tipedef_pars.typedef_pars import Typedef
-#from define_parse.define_parse import Define
+from typedef_pars.typedef_pars import Typedef
+from define_parse.define_parse import Define
 
 
 @dataclass
@@ -12,18 +12,18 @@ class AllElement:  # общий класс для хранения списко�
 
     def create_list(self):
         self.function_list = []
-        #self.define_list = []
-        #self.typedef_list = []
+        self.define_list = []
+        self.typedef_list = []
 
     # функции добавления нового элемента в списки по классам
     def add_function(self, func: Function):
         self.function_list.append(func)
 
-    # def add_define(self, define: Define):
-    #     self.define_list.append(define)
-    #
-    # def add_typedef(self, typ: Typedef):
-    #     self.typedef_list.append(typ)
+    def add_define(self, define: Define):
+        self.define_list.append(define)
+
+    def add_typedef(self, typ: Typedef):
+        self.typedef_list.append(typ)
 
     # функции возвращения списков элементов
 
@@ -42,10 +42,10 @@ class AllElement:  # общий класс для хранения списко�
         ...
         return self.function_list[index_fun]
 
-    # def index_def(self, index_def: int) -> Define:
-    #     ...
-    #     return self.define_list[index_def]
-    #
-    # def index_typedef(self, index_typ: int) -> Typedef:
-    #     ...
-    #     return self.typedef_list[index_typ]
+    def index_def(self, index_def: int) -> Define:
+        ...
+        return self.define_list[index_def]
+
+    def index_typedef(self, index_typ: int) -> Typedef:
+        ...
+        return self.typedef_list[index_typ]
