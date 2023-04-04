@@ -1,22 +1,30 @@
 # Файл содержит описание объектов для парсинга .h файла
 from dataclasses import dataclass
+from enum import Enum, unique
+
+
+@unique
+class ParseKeyWords(Enum):
+    TYPEDEF = 1
+    DEFINE = 2
+    FUNCTION = 3
 
 
 @dataclass
-class Parse_object():
+class ParseObject:
     name: str
     line_number: int
     file_name: str
-    key_word: str  # func or define or typedef
+    key_word: ParseKeyWords
 
 
 @dataclass
-class Parse_define(Parse_object):
+class ParseDefine(ParseObject):
     value: str  # can be 15, (1 << 20), uint16_t etc.
 
 
 @dataclass
-class Parce_func(Parse_object):
+class ParceFunc(ParseObject):
     return_type: str
     input_arg: dict  # 'variable' = int
     number_arg: int
@@ -25,5 +33,6 @@ class Parce_func(Parse_object):
 
 
 @dataclass
-class Parce_typedef(Parse_object):
+class ParceTypedef(ParseObject):
     target_type: str
+    
