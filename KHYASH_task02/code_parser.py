@@ -1,5 +1,5 @@
-# import json
-# import os.path
+import json
+import os.path
 from termcolor import cprint
 
 DATA_TYPES = ["int", "string", "double", "char", "long"]
@@ -55,7 +55,6 @@ class c_validator:
 
     def add_typedef(self, name: str) -> None:
         self.data_types.append(name)
-
 
 class Parsing:
     def __init__(self, code_path: str) -> None:
@@ -185,3 +184,73 @@ class Parsing:
 
 
         cprint(f" -- done {len(self.typedef_list)} typedef's", "green")
+
+
+class Code_parser:
+    def __init__(self, input_filename: str, output_filename: str = "output.json") -> None:
+
+        # validate and declare input filename
+        if self.validate_input_file(input_filename):
+            self.input_filename = input_filename
+
+        # validate and declare output filename
+        if self.validate_output_file(file_path = output_filename):
+            self.output_filename = output_filename
+
+    def validate_input_file(self, file_path: str) -> bool:
+        # check the file extention
+        if not file_path.endswith(".c"):
+            raise Exception("you need to use only C files")
+
+        # check the file presense
+        if not os.path.isfile(file_path):
+            raise Exception("file is not exists")
+
+        return True
+
+    def validate_output_file(self, file_path: str) -> bool:
+        # check the file extention
+        if not file_path.endswith(".json"):
+            raise Exception("you need to use only JSON files to output")
+
+        return True
+
+    def load_to_json(self, function_list: list, define_list: list, typedef_list: list) -> None:
+        brief_dict = {
+                "functions" : [],
+                "defines" : [],
+                "typedefs" : []
+                }
+
+        for i in function_list:
+            function = {
+                    "name" : i.name,
+                    "return_type" : i.return_type,
+                    "args" : i.args
+                    }
+            brief_dict["functions"].append(function)
+
+        for i in typedef_list:
+            typedef = {
+                    "name" : i.name,
+                    "point_type" : i.point_type
+                    }
+            brief_dict["typedefs"].append(typedef)
+
+        for i in define_list:
+            define = {
+                    "name" : i.name,
+                    "definition" : i.definition
+                    }
+            brief_dict["defines"].append(define)
+
+        with open(self.output_filename, "w", encoding = "utf-8") as file:
+            file.write(json.dumps(brief_dict, indent = 4))
+
+
+    def run_parser(self) -> None:
+        cprint("...parsing", "green")
+        parsing = Parsing(self.input_filename)
+        parsing.run()
+        cprint("done!", "green")
+        self.load_to_json(parsing.function_list, parsing.define_list, parsing.typedef_list)
