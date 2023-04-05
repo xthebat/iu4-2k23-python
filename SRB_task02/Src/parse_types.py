@@ -35,3 +35,4 @@ class ParceFunc(ParseObject):
 @dataclass
 class ParceTypedef(ParseObject):
     target_type: str
+
