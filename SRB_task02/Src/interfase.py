@@ -53,5 +53,6 @@ def get_parsed_args() -> argparse.Namespace:
     add_parser_args(parser)
     return parser.parse_args()
 
+
 def main(argc: list[str]) -> int:
     pass

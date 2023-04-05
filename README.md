@@ -1,9 +1,7 @@
 # iu4-2k23-python
 
-Try second commit
+Shishurin - 4i4urin
 
-Shishurin 	- 4i4urin
-Bondarenko 	- Bandix123
-Rozhkov		- Art-me-plz
+Bondarenko - Bandix123
 
-
+Rozhkov- Art-me-plz
