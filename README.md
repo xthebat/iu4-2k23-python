@@ -39,6 +39,7 @@
 - map, filter, any, all, sorted, reversed
 - zip
 - next
+- starmap
 - isinstance, issubclass, id, type
 
 ## Классы в Python

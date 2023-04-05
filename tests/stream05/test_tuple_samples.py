@@ -1,5 +1,5 @@
 from stream05.common import benchmark
-from stream05.tuple_sample import tuple_filter, list_filter, list_accumulate
+from stream05.tuple_sample import list_filter, list_accumulate, tuple_filter
 
 
 def test_tuple_filter():
@@ -19,12 +19,14 @@ def test_list_filter():
 
     collection: list[int] = list(range(20_000))
 
-    @benchmark
     def function():
         result = list_filter(collection, lambda it: it > 10_000)
         assert result
 
     function()
+
+
+#   ^_^
 
 
 def test_list_accumulate():
