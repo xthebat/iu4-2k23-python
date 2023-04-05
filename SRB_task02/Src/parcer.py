@@ -29,3 +29,8 @@ class Parser:
         pass
 
     __parse_obj_list: list[ParseObject]
+
+    __ctypes_set = {"auto", "char", "const", "double", "enum", "extern", "float", "inline", "int", "long", "register",
+                    "short", "signed", "static", "struct", "union", "unsigned", "void", "volatile"}
+
+    __parce_keywords = {"#define", "typedef", ";"}
