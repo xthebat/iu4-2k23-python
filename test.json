@@ -1,0 +1,1 @@
+{"functions": [], "types": [], "defines": [{"name": "CONSTANT", "value": "123", "line_num": 16}, {"name": "SOME_CONSTANT", "value": "\"some_value\"", "line_num": 19}], "variables": [{"var_type": "int", "name": "x", "line_num": 4}, {"var_type": "int", "name": "y", "line_num": 5}, {"var_type": "return", "name": "0", "line_num": 28}], "structures": []}
