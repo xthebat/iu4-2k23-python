@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class BaseParsedObject:
+
     def __find_object(self, filename: str) -> list[str]:
         raise NotImplementedError
 
