@@ -1,12 +1,12 @@
-from base_class import Base
+from base_class import BaseParsedObject
 from dataclasses import dataclass
-from function_print_class import FunctionPrinting
+from object_print_class import FunctionPrinting
 
 
 @dataclass
-class Function(Base):
+class Function(BaseParsedObject):
 
-    def __find_element(self, filename: str):
+    def __find_object(self, filename: str) -> list[str]:
         with open(filename, 'r', encoding='utf-8') as file:
             file_content = file.readlines()
 
@@ -36,14 +36,14 @@ class Function(Base):
     def __find_func_args(self, string: str) -> list[str]:
         return (string[string.index('(') + 1:string.index(')')]).split()
 
-    def print_function(self, filename: str) -> list:
-        function_list = Function.__find_element(self, filename)
+    def print_object(self, filename: str) -> list:
+        function_list = self.__find_element(self, filename)
         function_object_list = []
 
         for element_func in function_list:
-            returned_type = Function.__find_func_type(self, element_func)
-            func_name = Function.__find_func_name(self, element_func)
-            func_arguments = Function.__find_func_args(self, element_func)
+            returned_type = self.__find_func_type(self, element_func)
+            func_name = self.__find_func_name(self, element_func)
+            func_arguments = self.__find_func_args(self, element_func)
 
             function_object = FunctionPrinting(returned_type, func_name, func_arguments)
             function_object_list.append(function_object)

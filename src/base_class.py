@@ -2,19 +2,13 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Base:
+    class BaseParsedObject:
 
-    def __find_element(self, filename: str) -> list[str]:
-        pass
+    def __find_object(self, filename: str) -> list[str]:
+        raise NotImplementedErrors
 
-    def print_function(self, filename: str) -> list:
-        pass
-
-    def print_typedef(self, filename: str) -> list:
-        pass
-
-    def print_define(self, filename: str) -> list:
-        pass
+    def print_object(self, filename: str) -> list:
+        raise NotImplementedError
 
     def find_string_number(self) -> int:
-        pass
+        raise NotImplementedError
