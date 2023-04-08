@@ -1,47 +1,72 @@
 import argparse
+import json
+import os.path
 from dataclasses import dataclass
 
-class CHeaderParser:
-    def set_json(self, str input):
-        ...
-    def get_json(self, str output):
-        ...
-    def parse(self, str input):
-        ...
-    def print(self):
-        ...
-    Function: dict
-    Variable: dict
-    Ifdef: dict
-    Include: dict
-    SyntaxError: dict
-    line_number: int
-
-
 @dataclass
-class Function(CHeaderParser):
+class Function:
     name: str
     return_type: str
     arguments: list
 
 @dataclass
-class Variable(CHeaderParser):
+class Variable:
     name: str
     data_type: str
     value: str
 
 @dataclass
-class Ifdef(CHeaderParser):
+class Ifdef:
     expression: str
 
 @dataclass
-class Include(CHeaderParser):
+class Include:
     filename: str
     contents: str
 
 @dataclass
-class SyntaxError(CHeaderParser):
+class SyntaxError:
     message: int
+
+class CHeaderParser:
+    def __init__(self):
+        self.functions = []
+        self.variables = []
+        self.ifdefs = []
+        self.includes = []
+        self.errors = []
+        self.line_number = 0
+        
+class CHeaderParser:
+    def __init__(self):
+        self.functions = []
+        self.variables = []
+        self.ifdefs = []
+        self.includes = []
+        self.errors = []
+        self.line_number = 0
+    def set_json(self, input_str):
+        data = json.loads(input_str)
+        self.functions = [Function(**f) for f in data.get('functions', [])]
+        self.variables = [Variable(**v) for v in data.get('variables', [])]
+        self.ifdefs = [Ifdef(**i) for i in data.get('ifdefs', [])]
+        self.includes = [Include(**i) for i in data.get('includes', [])]
+        self.errors = [SyntaxError(**e) for e in data.get('errors', [])]
+        self.line_number = data.get('line_number', 0)
+    def get_json(self):
+        data = {
+            'functions': [f.__dict__ for f in self.functions],
+            'variables': [v.__dict__ for v in self.variables],
+            'ifdefs': [i.__dict__ for i in self.ifdefs],
+            'includes': [inc.__dict__ for inc in self.includes],
+            'errors': [err.__dict__ for err in self.errors],
+            'line_number': self.line_number
+        }
+        return json.dumps(data, indent=4)
+    def parse(self, str input):
+        ...
+    def print(self):
+        ...
 
 
 def main(args: list[str]) -> int:
