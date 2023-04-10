@@ -1,4 +1,4 @@
-class List_of_functions:
+class FunctionsList:
 
     def __init__(self, list_of_fuctions_as_classes):
         self.list_to_parse = list_of_fuctions_as_classes
@@ -16,7 +16,7 @@ class List_of_functions:
         return newlist
 
 
-class List_of_defines:
+class DefinesList:
 
     def __init__(self, list_of_defines_as_classes):
         self.list_to_parse = list_of_defines_as_classes
@@ -33,7 +33,7 @@ class List_of_defines:
         return newlist
 
 
-class List_of_typedefs:
+class TypedefsList:
 
     def __init__(self, list_of_typedefs_as_classes):
         self.list_to_parse = list_of_typedefs_as_classes
@@ -50,7 +50,7 @@ class List_of_typedefs:
         return newlist
 
 
-class dictionary_to_json:
+class DictionaryForJSON:
     def __init__(self, functions, defines, typedefs):
         self.list_of_functions = List_of_functions(functions)
         self.list_of_defines = List_of_defines(defines)
