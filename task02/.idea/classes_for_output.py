@@ -52,9 +52,9 @@ class TypedefsList:
 
 class DictionaryForJSON:
     def __init__(self, functions, defines, typedefs):
-        self.list_of_functions = List_of_functions(functions)
-        self.list_of_defines = List_of_defines(defines)
-        self.list_of_typedefs = List_of_typedefs(typedefs)
+        self.list_of_functions = FunctionsList(functions)
+        self.list_of_defines = DefinesList(defines)
+        self.list_of_typedefs = TypedefsList(typedefs)
 
     def output_dictionary(self):
         dictionary = {
