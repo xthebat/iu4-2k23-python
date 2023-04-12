@@ -1,75 +1,216 @@
-# Stream 06
+# Stream 08
 
-## Структура проекта в IntelliJ
+## Как писать документацию к коду
 
-## Pytest
+```python
+class FilteredBinaryIO(Readable):
+    """
+    Stream to wrap other stream.
+    """
 
-- Что делают программисты IntelliJ на работе или как пофиксить pytest-benchmark...
+    @classmethod
+    def from_bytes(cls, data: bytes, **kwargs) -> Self:
+        """
+        Method creates specified stream from bytes.
+    
+        :param data: Data to create stream from.
+        :param kwargs: Free argument to create stream from bytes.
+        :return: Created stream according to arguments.
+        """
+        return cls(BytesIO(data), **kwargs)
+```
 
-## Коллекции:
+## Переусложнение кода
 
-### dict
+Инкапсуляция структур
 
-Что не забыть рассказать:
+```python
+from dataclasses import dataclass
 
-- Для чего используется
-- get(), fromkeys(), setdefault(), items(), keys()
-- получить уникальные элементы без изменения порядка
 
-## Comprehension:
+@dataclass
+class Define:  # экземпляры: найденные define
 
-- comprehension для list
-- comprehension для dict
-- поиск (next/get)
-- модификация
-- фильтрация
-- морж-оператор в list-comprehension
+    def get_name(self):
+        return self.name
 
-## Встроенные функции Python
+    def get_value(self):
+        return self.value
+```
 
-Полезные ссылки:
+## Плохие имена
 
-- https://docs.python.org/3/library/functions.html
+Бессмысленные сокращение имен переменных, функций и т.п.
 
-Что не забыть рассказать:
+```python
+from dataclasses import dataclass
 
-- ленивые вычисления
-- sum, max, min
-- range, len, enumerate
-- map, filter, any, all, sorted, reversed
-- zip
-- next
-- starmap
-- isinstance, issubclass, id, type
 
-## Классы в Python
+@dataclass
+class Function:
+    numb_line: int
 
-Терминология ООП - выучить наизусть
-https://www.tutorialspoint.com/python/python_classes_objects.htm
-Принципы ООП - выучить наизусть
-https://tproger.ru/translations/oop-principles-cheatsheet/
-https://topjava.ru/blog/oops-concepts-in-java
-https://medium.com/nuances-of-programming/%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%D0%BD%D0%BE-%D0%BE%D1%80%D0%B8%D0%B5%D0%BD%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%D0%B5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B4%D0%BB%D1%8F-%D1%81%D0%B0%D0%BC%D1%8B%D1%85-%D0%BC%D0%B0%D0%BB%D0%B5%D0%BD%D1%8C%D0%BA%D0%B8%D1%85-b0e0578761f1
-https://skillbox.ru/media/code/kak-izbezhat-putanitsy-v-kode-ili-kratkiy-kurs-oop-na-python/
 
-- Как объявить класс + конструктор
-    - public/protected/private члены класса
-    - Аксессоры (геттеры и сеттеры)
-    - Статические переменные для обычных классов
-        - (!) Изменяемые статические переменные
-- dataclass'ы - стараемся использовать их
-    - наследование
-    - особенности инициализации полей (default_factory)
-    - параметры создания dataclass (frozen, unsafe_hash)
-    - преобразование к словарю и обратно
-    - https://docs.python.org/3/library/dataclasses.html
-- Как наследовать классы
-    - Просто наследование
-    - Наследование встроенных типов
-    - Интерфейсы, протоколы, ABC
-- magic-методы (операторы)
-    - __repr__, __str__, __hash__, __eq__, __call__, __iter__, __next__ ...
-- staticmethod'ы и classmethod'ы - как создавать классы
-- Метаклассы и динамическое создание классов :)
+class ParsFunction:
 
-## Как сохранять в JSON
+    # функции, достающие из строки нужные элементы (имя функции, возвращаемый тип и т.д.)
+    def ent_line(self, funct_line: str) -> int:
+        ...
+```
+
+## Некорректная инициализация dataclass + изменяемые сущности
+
+```python
+@dataclass
+class AllElement:  # общий класс для хранения списков классов
+    function_list: list[Function] = None
+
+    def create_list(self):
+        self.function_list = []
+        self.define_list = []
+        self.typedef_list = []
+
+    # функции добавления нового элемента в списки по классам
+    def add_function(self, func: Function):
+        self.function_list.append(func)
+```
+
+## Некорректный нейминг
+
+```python
+class List_of_functions:
+    ...
+
+
+class dictionary_to_json:
+    ...
+
+
+# https://github.com/xthebat/iu4-2k23-python/pull/50/files
+class c_validator:
+    def __init__(self) -> None:
+        self.data_types = DATA_TYPES
+        self.modifiers = MODIFIERS
+```
+
+## Некорректный вызов функций
+
+```python
+def print_define(self, filename: str) -> list:
+    define_list = Define.__find_element(self, filename)
+```
+
+## Приватные методы в интерфейсе + метод не абстрактный
+
+```python
+class Base:
+
+    def __find_element(self, filename: str) -> list[str]:
+        pass
+```
+
+## Использование дефолтного парсера аргументов
+
+```python
+    parser.add_argument(
+    '-f',
+    type=str,
+    required=True,
+    dest='filepath',
+    help='filepath to parse',
+)
+```
+
+## Некорректная документация + изменяемый объект
+
+```python
+# Notes
+# На вход парсера поступает список строк, каждая строка имеет свой номер как во входнмом файле
+# пустые строки -- NONE
+# парсер заполняет список объектов
+
+@dataclass
+class Parser:
+    # read input string fill private list of objects for parse
+    def parse_string(self, string_list: list[str]):
+        pass
+
+    def get_object_list(self) -> list[ParseObject]:
+        pass
+
+    def __take_typedef(self) -> ParceTypedef:
+        pass
+```
+
+## Использование статических переменных как обычных
+
+```python
+class Function:
+    name: str
+    return_type: int
+    args: dict
+
+    def __init__(self, name: str, return_type: str, args: dict) -> None:
+        self.name = name
+        self.return_type = return_type
+        self.args = args
+```
+
+## Не используется функциональные паттерн
+
+```python
+ for data_type in self.data_types:
+    for i in self.modifiers:
+        template = i + data_type + space
+        if line.startswith(i + data_type + space):
+            return template
+```
+
+## Рассмотреть подробнее
+
+https://github.com/xthebat/iu4-2k23-python/pull/50/files
+
+## Конвертация в словарь
+
+```python
+@dataclass
+class typedef_unit:
+    type: str
+    annotation: str
+
+    def __dict__(self):
+        pass
+```
+
+## Не будет работать
+
+```python
+class Analyzer:
+    def __init__(self, filestr_):
+        _filestr = filestr_
+        _analyzed_data = None
+
+
+def test():
+    pass
+```
+
+## Vom...it
+
+```python
+FUNC_REGEX = r'^\s*(\w+\s+\**)(\w+)\s*\(([^\)]*)\)\s*;'
+TYPE_REGEX = r'^\s*typedef\s+(\w+)\s+(\w+)\s*;'
+DEFINE_REGEX = r'^\s*#define\s+(\w+)\s+(.*)$'
+VARIABLE_REGEX = r'^\s*(extern\s+)?(\w+\s+\**)(\w+)\s*;'
+STRUCT_REGEX = r'^\s*struct\s+(\w+)\s*{([^}]*)}\s*;'
+```
+
+```python
+    def add_function(self, return_type: str, name: str, args: str, line_num: int) -> None:
+
+
+    self.functions.append({'return_type': return_type.strip(),
+                           'name': name.strip(),
+                           'args': args.strip(),
+                           'line_num': line_num})
+```

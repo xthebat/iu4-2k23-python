@@ -9,9 +9,19 @@ class Readable:
 
 
 class FilteredBinaryIO(Readable):
+    """
+    Stream to wrap other stream.
+    """
 
     @classmethod
     def from_bytes(cls, data: bytes, **kwargs) -> Self:
+        """
+        Method creates specified stream from bytes.
+
+        :param data: Data to create stream from.
+        :param kwargs: Free argument to create stream from bytes.
+        :return: Created stream according to arguments.
+        """
         return cls(BytesIO(data), **kwargs)
 
     def __init__(self, stream, **kwargs):
