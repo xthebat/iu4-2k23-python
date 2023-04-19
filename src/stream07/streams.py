@@ -4,7 +4,13 @@ from typing import Self, Literal, Callable, Generic, TypeVar, TypeAlias
 
 class Readable:
 
-    def read(self, n: int) -> bytes:
+    def read(self, n: int, **kwargs) -> bytes:
+        """
+        Метод читает n заданных байт из Readable.
+
+        :param n: Количество вычитанных байт
+        :return: Вычитанные байты
+        """
         raise NotImplementedError
 
 
@@ -24,20 +30,23 @@ class FilteredBinaryIO(Readable):
         """
         return cls(BytesIO(data), **kwargs)
 
-    def __init__(self, stream, **kwargs):
+    def __init__(self, stream: Readable | BytesIO, **kwargs):
         self._stream = stream
 
-    def read(self, n: int):
+    def read(self, n: int, **kwargs):
         return self._stream.read(n)
 
 
 class CountingBinaryIO(FilteredBinaryIO):
+    """
+    Поток, который считает количество вычитанных байт
+    """
 
     def __init__(self, stream, **kwargs):
         super().__init__(stream, **kwargs)
         self.count = 0
 
-    def read(self, n: int):
+    def read(self, n: int, **kwargs):
         self.count += n
         return super().read(n)
 
@@ -53,7 +62,7 @@ class ReduceBinaryIO(FilteredBinaryIO, Generic[T]):
         self._reduce = reduce
         self._result = init
 
-    def read(self, n: int):
+    def read(self, n: int, **kwargs):
         data = super().read(n)
         self._result = self._reduce(self._result, data)
         return data

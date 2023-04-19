@@ -48,10 +48,10 @@ from dataclasses import dataclass
 
 @dataclass
 class Function:
-    numb_line: int
+    line_number: int
 
 
-class ParsFunction:
+class ParseFunction:
 
     # функции, достающие из строки нужные элементы (имя функции, возвращаемый тип и т.д.)
     def ent_line(self, funct_line: str) -> int:
@@ -78,17 +78,17 @@ class AllElement:  # общий класс для хранения списко�
 ## Некорректный нейминг
 
 ```python
-class List_of_functions:
+class FunctionsList:
     ...
 
 
-class dictionary_to_json:
+class JsonToDictConverter:
     ...
 
 
 # https://github.com/xthebat/iu4-2k23-python/pull/50/files
-class c_validator:
-    def __init__(self) -> None:
+class CValidator:
+    def __init__(self):
         self.data_types = DATA_TYPES
         self.modifiers = MODIFIERS
 ```
@@ -96,8 +96,8 @@ class c_validator:
 ## Некорректный вызов функций
 
 ```python
-def print_define(self, filename: str) -> list:
-    define_list = Define.__find_element(self, filename)
+def print_define(self, filename: str) -> list[Element]:
+    defines = Define.__find_elements(self, filename)
 ```
 
 ## Приватные методы в интерфейсе + метод не абстрактный
@@ -159,7 +159,7 @@ class Function:
 ## Не используется функциональные паттерн
 
 ```python
- for data_type in self.data_types:
+for data_type in self.data_types:
     for i in self.modifiers:
         template = i + data_type + space
         if line.startswith(i + data_type + space):
@@ -174,7 +174,7 @@ https://github.com/xthebat/iu4-2k23-python/pull/50/files
 
 ```python
 @dataclass
-class typedef_unit:
+class TypedefUnit:
     type: str
     annotation: str
 
@@ -186,9 +186,9 @@ class typedef_unit:
 
 ```python
 class Analyzer:
-    def __init__(self, filestr_):
-        _filestr = filestr_
-        _analyzed_data = None
+    def __init__(self, file: TextIO):
+        self._filestr = filestr_
+        self._analyzed_data = None
 
 
 def test():
@@ -209,8 +209,8 @@ STRUCT_REGEX = r'^\s*struct\s+(\w+)\s*{([^}]*)}\s*;'
     def add_function(self, return_type: str, name: str, args: str, line_num: int) -> None:
 
 
-    self.functions.append({'return_type': return_type.strip(),
-                           'name': name.strip(),
-                           'args': args.strip(),
-                           'line_num': line_num})
+self.functions.append({'return_type': return_type.strip(),
+                       'name': name.strip(),
+                       'args': args.strip(),
+                       'line_num': line_num})
 ```
