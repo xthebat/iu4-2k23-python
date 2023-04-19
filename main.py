@@ -3,24 +3,55 @@ import json
 import re
 import os
 
-#Команда Невзорова Юлиана ИУ4-83Б, Ильин Андрей ИУ4-82Б
-#Со всеми бонусами
-
 #Определяем регулярные выражения для синтаксического анализа заголовочных файлов C:
-FUNC_REGEX = r'^\s*(\w+\s+\**)(\w+)\s*\(([^\)]*)\)\s*;'
-TYPE_REGEX = r'^\s*typedef\s+(\w+)\s+(\w+)\s*;'
-DEFINE_REGEX = r'^\s*#define\s+(\w+)\s+(.*)$'
-VARIABLE_REGEX = r'^\s*(extern\s+)?(\w+\s+\**)(\w+)\s*;'
-STRUCT_REGEX = r'^\s*struct\s+(\w+)\s*{([^}]*)}\s*;'
 
-# Make by Nevzorova
 class CHeaderView:
-    def __init__(self) -> None:
+    FUNC_REGEX = re.compile(r'^\s*(\w+\s+\**)(\w+)\s*\(([^\)]*)\)\s*;')
+    TYPE_REGEX = re.compile(r'^\s*typedef\s+(\w+)\s+(\w+)\s*;')
+    DEFINE_REGEX = re.compile(r'^\s*#define\s+(\w+)\s+(.*)$')
+    VARIABLE_REGEX = re.compile(r'^\s*(extern\s+)?(\w+\s+\**)(\w+)\s*;')
+    STRUCT_REGEX = re.compile(r'^\s*struct\s+(\w+)\s*{([^}]*)}\s*;')
+
+    def __init__(self):
         self.functions = []
         self.types = []
         self.defines = []
         self.variables = []
         self.structures = []
+
+    def parse_file(self, filename):
+        '''Парсим данный C файл'''
+        with open(filename, 'r') as f:
+            lines = f.readlines()
+        for i, line in enumerate(lines):
+            ''' Удаляем комментарии '''
+            line = re.sub(r'//.*$', '', line)
+            line = re.sub(r'/\*.*?\*/', '', line, flags=re.DOTALL)
+            '''Парсим объявления функций'''
+            match = self.FUNC_REGEX.match(line)
+            if match:
+                self.add_function(match.group(1), match.group(2), match.group(3), i + 1)
+                continue
+            '''Парсим typedef'''
+            match = self.TYPE_REGEX.match(line)
+            if match:
+                self.add_type(match.group(1), match.group(2), i + 1)
+                continue
+            '''Парсим дефайны'''
+            match = self.DEFINE_REGEX.match(line)
+            if match:
+                self.add_define(match.group(1), match.group(2), i + 1)
+                continue
+            '''Парсим переменные'''
+            match = self.VARIABLE_REGEX.match(line)
+            if match:
+                self.add_variable(match.group(2), match.group(3), i + 1)
+                continue
+            '''Парсим структуры'''
+            match = self.STRUCT_REGEX.match(line)
+            if match:
+                self.add_structure(match.group(1), match.group(2), i + 1)
+                continue
 
     def add_function(self, return_type: str, name: str, args: str, line_num: int) -> None:
         self.functions.append({'return_type': return_type.strip(),
@@ -74,7 +105,6 @@ class CHeaderView:
             header_view.add_structure(struct['name'], struct['fields'], struct['line_num'])
         return header_view
 
-# Make by Ilyin
     @classmethod
     def from_json(cls, filename: str) -> 'CHeaderView':
         with open(filename, 'r') as f:
@@ -106,40 +136,7 @@ class CHeaderView:
                     print(f"    {field.strip()};")
             print("}")
 
-    def parse_file(self, filename):
-        with open(filename, 'r') as f:
-            lines = f.readlines()
-        for i, line in enumerate(lines):
-            # Remove comments
-            line = re.sub(r'//.*$', '', line)
-            line = re.sub(r'/\*.*?\*/', '', line, flags=re.DOTALL)
-            # Parse function declarations
-            match = re.match(FUNC_REGEX, line)
-            if match:
-                self.add_function(match.group(1), match.group(2), match.group(3), i + 1)
-                continue
-            # Parse typedefs
-            match = re.match(TYPE_REGEX, line)
-            if match:
-                self.add_type(match.group(1), match.group(2), i + 1)
-                continue
-            # Parse defines
-            match = re.match(DEFINE_REGEX, line)
-            if match:
-                self.add_define(match.group(1), match.group(2), i + 1)
-                continue
-            # Parse variables
-            match = re.match(VARIABLE_REGEX, line)
-            if match:
-                self.add_variable(match.group(2), match.group(3), i + 1)
-                continue
-            # Parse structures
-            match = re.match(STRUCT_REGEX, line)
-            if match:
-                self.add_structure(match.group(1), match.group(2), i + 1)
-                continue
 
-# Make by Nevzorova
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Парссинг файла C')
     parser.add_argument('input_file', help='Файл, который парсим.')
