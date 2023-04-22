@@ -48,10 +48,11 @@ def test_point_binary():
     end_value = stream.read(3)
     assert end_value == b"END"
 
-    expected = Rectangle.new(
-        name="ThisIsARectangle",
-        lb=Point.new(name="LeftBottom", x=14099, y=44510),
-        rt=Point.new(name="RightTop", x=1, y=2),
+    # We may not wrap fields cus all class inherited from default Python class with its __compare__ method
+    expected = Rectangle(
+        "ThisIsARectangle",
+        Point("LeftBottom", 14099, 44510),
+        Point("RightTop", 1, 2),
     )
 
     assert actual == expected

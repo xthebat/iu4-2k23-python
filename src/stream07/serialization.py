@@ -13,12 +13,14 @@ class Serializable:
 
 
 class Integer(int, Serializable):
+    """Class adds deserialize method to default int class"""
+
     __size__: int
     __signed__: bool
 
     @classmethod
     def deserialize(cls, stream: DataBinaryIO):
-        return stream.read_uint(cls.__size__, cls.__signed__)
+        return cls(stream.read_uint(cls.__size__, cls.__signed__))
 
 
 class Int8(Integer):
@@ -52,28 +54,27 @@ class UInt32(Integer):
 
 
 class AsciiString(str, Serializable):
+    """Class adds deserialize method to default str class"""
+
     @classmethod
     def deserialize(cls, stream: DataBinaryIO):
-        return stream.read_string()
+        return cls(stream.read_string())
 
 
 @dataclass
 class Struct(Serializable):
+    """Class adds deserialize method to dataclass from fields definition"""
 
-    @classmethod
-    def new(cls, **kwargs) -> Self:
-        kwargs = {field.name: field.type(kwargs[field.name]) for field in dataclasses.fields(cls)}
-        # noinspection PyArgumentList
-        return cls(**kwargs)
+    def __init_subclass__(cls, **kwargs):
+        # Make class subclass validation
+        assert dataclasses.is_dataclass(cls), f"Class should be marked as dataclass to be Serializable, got {cls}"
+        invalids = [field.name for field in dataclasses.fields(cls) if not issubclass(field.type, Serializable)]
+        assert not invalids, \
+            f"All class fields must be inherited from Serializable, fields not serializable: {invalids}"
+        super().__init_subclass__(**kwargs)
 
     @classmethod
     def deserialize(cls, stream: DataBinaryIO):
-        def _deserialize_field(field: dataclasses.Field):
-            assert issubclass(field.type, Serializable), f"Fields must be inherited from Serializable"
-            value = field.type.deserialize(stream)
-            print(f"{field.type} = {value}")
-            return value
-
-        assert dataclasses.is_dataclass(cls), f"Can only deserialize dataclasses, got {cls}"
-        kwargs = {field.name: _deserialize_field(field) for field in dataclasses.fields(cls)}
-        return cls.new(**kwargs)
+        kwargs = {field.name: field.type.deserialize(stream) for field in dataclasses.fields(cls)}
+        # noinspection PyArgumentList
+        return cls(**kwargs)
