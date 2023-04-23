@@ -1,11 +1,3 @@
-def tryexcept(line):
-    try:
-        args = line.split('(')[1].split(')')[0]
-    except IndexError:
-        args = None
-    return args
-
-
 class CHandlerClass:
     def __init__(self):
         self.functions = []
@@ -13,6 +5,13 @@ class CHandlerClass:
         self.types = []
 
     def functions_handler(self, idx, line):
+        def tryexcept(row):
+            try:
+                args = row.split('(')[1].split(')')[0]
+            except IndexError:
+                args = None
+            return args
+
         args = tryexcept(line)
         self.functions.append(
             {
