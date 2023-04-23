@@ -2,55 +2,66 @@ from dataclasses import dataclass
 
 
 @dataclass
-class define_unit:
+class DefineUnit:
     name: str
     value: str
 
     def __dict__(self):
-        pass
+        return {'name': self.name, 'value': self.value}
 
 
 @dataclass
-class typedef_unit:
-    type: str
-    annotation: str
-
-    def __dict__(self):
-        pass
-
-
-@dataclass
-class c_var:
+class TypedefUnit:
     type: str
     name: str
 
     def __dict__(self):
-        pass
+        return {'name':self.name, 'type': self.type}
 
 
 @dataclass
-class func_unit:
-    name: str
+class CVar:
     type: str
-    args: list[c_var]
+    name: str
 
     def __dict__(self):
-        pass
+        return {'name': self.name, 'type': self.type}
 
 
 @dataclass
-class parser_unit:
+class FuncUnit:
+    name: str
+    type: str
+    args: list[CVar]
+
+    def __dict__(self):
+        return {'name': self.name, 'type': self.type, 'args': [arg.__dict__() for arg in self.args]}
+
+
+@dataclass
+class ParserUnit:
     line: int
     char_offset: int
-    type: str
-    object: dict
+    object: FuncUnit or DefineUnit or TypedefUnit
 
     def __dict__(self):
-        pass
+        return {'line': self.line, 'object': self.object.__dict__(), 'offset': self.char_offset}
+
+
+@dataclass
+class CHeaderView:
+    functions: list[ParserUnit]
+    defines: list[ParserUnit]
+    typedefs: list[ParserUnit]
+
+    def __dict__(self):
+        return {'functions': [element.__dict__() for element in self.functions],
+                'defines': [element.__dict__() for element in self.defines],
+                'typedefs': [element.__dict__() for element in self.typedefs]}
 
 
 parser_units = {
-    'define': define_unit,
-    'typedef': typedef_unit,
-    'function': func_unit
+    'define': DefineUnit,
+    'typedef': TypedefUnit,
+    'function': FuncUnit
 }

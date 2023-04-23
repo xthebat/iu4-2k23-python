@@ -1,5 +1,6 @@
 {
   "ctypes": [
+    "void",
     "char", "unsigned char", "signed char",
     "short", "short int", "unsigned short", "unsigned short int", "signed short", "signed short int",
     "int", "unsigned", "unsigned int", "signed", "signed int",
@@ -7,14 +8,22 @@
     "long long", "long long int", "unsigned long long", "unsigned long long int", "signed long long", "signed long long int",
     "float",
     "double",
-    "long double"
+    "long double",
+    "char*", "unsigned char*", "signed char*",
+    "short*", "short int*", "unsigned short*", "unsigned short int*", "signed short*", "signed short int*",
+    "int*", "unsigned*", "unsigned int*", "signed*", "signed int*",
+    "long*",  "long int*", "unsigned long*", "unsigned long int*", "signed long*", "signed long int*",
+    "long long*", "long long int*", "unsigned long long*", "unsigned long long int*", "signed long long*", "signed long long int*",
+    "float*",
+    "double*",
+    "long double*"
   ],
   "parsing_units": [
     "define", "function", "typedef"
   ],
   "keywords": {
-    "define": "#define",
-    "typedef": "typedef",
-    "function": null
+    "define": ["str", "#define"],
+    "typedef": ["str","typedef"],
+    "function": ["list", "ctypes"]
   }
 }
