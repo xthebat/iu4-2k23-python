@@ -1,33 +1,43 @@
+def tryexcept(line):
+    try:
+        args = line.split('(')[1].split(')')[0]
+    except IndexError:
+        args = None
+    return args
+
+
 class CHandlerClass:
     def __init__(self):
         self.functions = []
         self.directives = []
         self.types = []
 
-    def functions_handler(self, idx, line):  # ToDo: args
+    def functions_handler(self, idx, line):
+        args = tryexcept(line)
         self.functions.append(
             {
                 'line': idx,
                 'function': line.split()[1].split('(')[0],
-                'arguments': None
+                'arguments': args
             }
         )
 
-    def directives_handler(self, idx, line):  # ToDo: ??
+    def directives_handler(self, idx, line):
         self.directives.append(
             {
                 'line': idx,
-                'directive': line.split()[1].split('(')[0]
+                'directive': line.split()[0],
+                'directive_value': line.split()[1].split('(')[0]
             }
         )
 
-    def types_handler(self, idx, line):  # ToDo: types
+    def types_handler(self, idx, line):
         for count, ntype in enumerate(line.split('(')[1].split(')')[0].split(), 1):
             if count % 2:
                 self.types.append(
                     {
                         'line': idx,
-                        'types': ntype
+                        'type': ntype
                     }
                 )
 
@@ -39,10 +49,14 @@ class CHandlerClass:
                     self.functions_handler(idx, line)
 
                 # directives
-                if line.find('define') != -1:  # ToDo: ifdef; ifndef; include
+                if '#' in line and line.split()[0] in ['#define', '#ifdef', '#ifndef', '#include']:
                     self.directives_handler(idx, line)
 
                 # types
-                if line.find('uint32_t') != -1:  # ToDo: types
-                    self.types_handler(idx, line)
+                types = ['char', 'int', 'float', 'double', 'void']
+                if line.find('(') != -1:
+                    line = line.split(' ', 1)[1]
+                for n_type in types:
+                    if n_type in line:
+                        self.types_handler(idx, line)
         return self.functions, self.directives, self.types
