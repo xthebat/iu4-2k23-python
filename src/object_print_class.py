@@ -2,14 +2,14 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DefinePrinting:
+class DefineObject:
     define_name: str
     define_value: str
     string_number: int = None
 
 
 @dataclass
-class FunctionPrinting:
+class FunctionObject:
     returned_type: str
     func_name: str
     func_arguments: list[str]
@@ -17,7 +17,7 @@ class FunctionPrinting:
 
 
 @dataclass
-class TypedefPrinting:
+class TypedefObject:
     declared_type: str
     target_type: str
     string_number: int = None
