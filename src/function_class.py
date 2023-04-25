@@ -10,8 +10,7 @@ class Function(BaseParsedObject):
         with open(filename, 'r', encoding='utf-8') as file:
             file_content = file.readlines()
 
-        temp_list = [element for element in file_content if element.find('(')]
-        return temp_list
+        return [element for element in file_content if '(' in element]
 
     def __find_func_type(self, string: str) -> str:
         temp_list_words = string.split()

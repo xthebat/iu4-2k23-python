@@ -21,15 +21,15 @@ class Typedef(BaseParsedObject):
 
     def __find_typedef_target(self, string: str) -> str:
         temp_list = string.split()
-        return ''.join(element[:element.index(';')] for element in temp_list if element.find(';'))
+        return ''.join(element[:element.index(';')] for element in temp_list if ';' in element)
 
     def print_object(self, filename: str) -> list:
-        typedef_list = self.find_object(self, filename)
+        typedef_list = self.find_object(filename)
         typedef_object_list = []
 
         for element_typedef in typedef_list:
-            declared_type = self.__find_typedef_declared(self, element_typedef)
-            target_type = self.__find_typedef_declared(self, element_typedef)
+            declared_type = self.__find_typedef_declared(element_typedef)
+            target_type = self.__find_typedef_declared(element_typedef)
             string_number = self.find_string_number(element_typedef, filename)
 
             typedef_object = TypedefObject(declared_type, target_type, string_number)

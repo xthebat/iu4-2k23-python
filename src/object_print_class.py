@@ -3,21 +3,21 @@ from dataclasses import dataclass
 
 @dataclass
 class DefineObject:
-    define_name: str
-    define_value: str
+    define_name: str = None
+    define_value: str = None
     string_number: int = None
 
 
 @dataclass
 class FunctionObject:
-    returned_type: str
-    func_name: str
-    func_arguments: list[str]
-    number_string: int = None
+    returned_type: str = None
+    func_name: str = None
+    func_arguments: list[str] = None
+    string_number: int = None
 
 
 @dataclass
 class TypedefObject:
-    declared_type: str
-    target_type: str
+    declared_type: str = None
+    target_type: str = None
     string_number: int = None
